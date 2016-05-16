@@ -1,0 +1,43 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+            <div class="alert alert-{{return_type}}">
+            {% for rmsg in return_msg %}
+                <p>{{rmsg}}</p>
+            {% endfor %}
+            </div>
+            <section id="contact">
+                <h1 class="text-center">Contacto</h1>
+                <h2 class="text-center">Lorem Ipsum</h2>
+                <div class="col-sm-12 socials">
+                    <div class="col-sm-3">
+                        <span><a href=""><img src="/images/2.0/redsocial_facebook.png"></a><strong>FACEBOOK/ESTADIO</strong></span>
+                    </div>
+                    <div class="col-sm-3">
+                        <span><a href=""><img src="/images/2.0/redsocial_twitter.png"></a><strong>#ESTADIO</strong></span>                    
+                    </div>
+                    <div class="col-sm-3">
+                        <span><a href=""><img src="/images/2.0/redsocial_google.png"></a><strong>#ESTADIO</strong></span>
+                    </div>
+                    <div class="col-sm-3">
+                        <span><a href=""><img src="/images/2.0/email.png"></a><strong>INFO@ESTADIO.COM.AR</strong></span>
+                    </div>                                                            
+                </div>
+                <div class="col-sm-8 col-sm-offset-2">
+                	<form method="POST" action="contact">
+                		<input type="text" name="name" placeholder="Nombre">
+                		<input type="text" name="email" placeholder="Email">
+                		<input type="text" name="msg" placeholder="Mensaje">
+                        <input type="submit" name="contacto" placeholder="Enviar" class="submit-contact">
+                	</form>
+                </div>
+            </section>
+            <br><br>
+            <br><br>
+            <div class="divider row">
+            </div>
+{% endblock content_page %}

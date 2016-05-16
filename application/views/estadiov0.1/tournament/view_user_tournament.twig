@@ -1,0 +1,78 @@
+{% extends constant('THEME_NAME')~'/tournament/base_tournament.twig' %}
+
+{% block tournament_info %}
+{% if tournament.start_at > 'now'|date('U') %}
+    {% if inscription and inscription.confirmed is not null %}
+        <div class="alert alert-info">Te encuentras inscripto y confirmado</div>
+    {% elseif inscription and inscription.confirmed is null %}
+        {% if tournament.time_to_confirm %}
+        <form method="POST" class="pull-right form-inline" role="form">
+            <button class="btn btn-succes" name="flag" value="confirm">Confirmar</button>
+        </form>
+        {% else %}            
+        <div class="alert alert-info">Recuerda confirmar tu presencia una hora antes del torneo, de lo contrario perderás la inscripción</div>
+        {% endif %}
+    {% elseif tournament.participants|length < tournament.vacancies %}
+        <form method="POST" class="pull-right form-inline" role="form">
+            <button class="btn btn-success" name="flag" value="inscript">Inscribirse</button>
+        </form>
+    {% elseif not let_me_know %}
+        <form method="POST" class="pull-right form-inline" role="form">
+            <button class="btn btn-warning" name="flag" value="let_me_know">Tenerme en cuenta</button>
+        </form>  
+    {% else %}
+        <div class="alert alert-warning">Te enviaremos un mail media hora antes de comenzar el torneo, en caso de que falten participantes por confirmar</div>
+    {% endif %}
+{% endif %}
+{% set count_brackets = tournament.settings.quantities.brackets %}
+<div class="info">
+    Ronda Actual: {{ count_brackets - tournament.settings.round + 1 }}
+    <br><br>
+</div>
+<div class="brackets">
+    <div class="wrap-table">
+        <div class="vert-middle">
+            {% for index, bracket in obj2array(tournament.brackets) %}               
+                
+                {% if index != 'third_place' and index != 'extra' %}
+                    {% set bracket_index = (count_brackets - index) %}
+                    <div class="bracket" style="left:{{ bracket_index * 210 }}px">
+                        {% for match_index, match in bracket %}
+                            <div class="match" style="top:{{ match_index * 72}}px">
+                                {% if match.match_id is defined %}
+                                <a href="/partida/{{ match.match_id }}">
+                                {% endif %}
+                                <div class="player place1">                                    
+                                    {% if match.player1 is not null %}
+                                        {% if match.player1 %}
+                                        {{ match.player1.name }}
+                                        {% else %}
+                                            <i>Vacío</i>
+                                        {% endif %}
+                                    {% else %}
+                                        <i>Ninguno</i>
+                                    {% endif %}   
+                                </div>
+                                <div class="player place2">
+                                    {% if match.player2 is not null %}
+                                        {% if match.player2 %}
+                                        {{ match.player2.name }}
+                                        {% else %}
+                                            <i>Vacío</i>
+                                        {% endif %}
+                                    {% else %}
+                                        <i>Ninguno</i>
+                                    {% endif %}   
+                                </div>
+                                {% if match.match_id is defined %}
+                                </a>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock tournament_info %}

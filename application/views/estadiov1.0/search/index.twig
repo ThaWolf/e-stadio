@@ -1,0 +1,60 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+    
+            <section id="search-results">
+                {% if (result) %}
+                    <h1 class="text-center">Resultados de la Búsqueda</h1>
+                    {% if (result.users) %}
+                    <div>
+                    <div class="row search-result">
+                    <h2 class="text-center">Usuarios</h2>
+
+                        {% for user in result.users %}
+                            <div class="col-sm-2">
+                                <div class="brand-thumb">
+                                    <a href="perfil/{{user.username}}.html" alt="{{user.username}}" title="{{user.username}}"><img src="uploads/{{ user.file_name }}"></a>
+                                    <strong>{{user.username}}</strong>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    </div>
+                        {% if (result.tournaments) %}
+                        <div class="divider row">
+                            <div>
+                                <img src="/images/2.0/divider.png">
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                    {% if (result.tournaments) %}
+                    <div>
+                    <div class="row search-result">
+                        <h2 class="text-center">Torneos</h2>
+
+                        {% for tournament in result.tournaments %}
+                            <div class="col-sm-2">
+                                <div class="brand-thumb">
+                                    <a href="torneo/{{tournament.id}}/{{tournament.name}}.html" alt="{{tournament.name}}" title="{{tournament.name}}"><img src="images/kundun.png"></a>
+                                    <strong>{{tournament.name}}</strong>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    </div>
+
+                    {% endif %}    
+                {% else %}
+                    <h1 class="text-center">No hay resultados de busqueda</h1>                
+                {% endif %}
+            </section>
+            <br><br>
+            <br><br>
+            <div class="divider row">
+            </div>
+{% endblock content_page %}

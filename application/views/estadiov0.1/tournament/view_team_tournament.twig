@@ -1,0 +1,36 @@
+{% extends constant('THEME_NAME')~'/tournament/base_tournament.twig' %}
+
+{% block tournament_info %}
+{% if tournament.start_at > 'now'|date('U') %}
+    {% if inscription and inscription.confirmed is not null %}
+        <div class="alert alert-info">Te encuentras inscripto y confirmado con el equipo <strong>{{ inscription.team_name }}</strong></div>
+    {% elseif inscription and inscription.confirmed is null %}
+        {% if tournament.time_to_confirm %}
+        <form method="POST" class="pull-right form-inline" role="form">
+            <button class="btn btn-succes" name="flag" value="confirm">Confirmar</button>
+        </form>
+        {% else %}            
+            <div class="alert alert-info">Recuerda confirmar la presencia del equipo <strong>{{ inscription.team_name }}</strong> una hora antes del torneo, de lo contrario perderán la inscripción</div>
+        {% endif %}
+    {% elseif tournament.participants|length < tournament.vacancies %}
+        {% if user_teams|length > 0 %}
+        <form method="POST" class="pull-right form-inline" role="form">
+            <select name="team" class="form-control">
+            {% for team in user_teams %}
+                <option value="{{ team.id }}">{{ team.name }}</option>
+            {% endfor %}
+            </select>
+            <button class="btn btn-success" name="flag" value="inscript">Inscribirse</button>
+        </form>
+        {% else %}
+        <div class="alert alert-warning">Para poder inscribirte debes ser capitán de un equipo completo</div>
+        {% endif %}
+    {% elseif not let_me_know %}
+        <form method="POST" class="pull-right form-inline" role="form">
+            <button class="btn btn-warning" name="flag" value="let_me_know">Tenerme en cuenta</button>
+        </form>  
+    {% else %}
+        <div class="alert alert-warning">Te enviaremos un mail media hora antes de comenzar el torneo, en caso de que falten participantes por confirmar</div>
+    {% endif %}
+{% endif %}
+{% endblock tournament_info %}

@@ -1,0 +1,36 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+            <div class="alert alert-info">Despues se van a poder configurar el tema de personalizar los tiempos de finalizacion y otros features</div>
+            <form method="post">
+                <select name="game_id" class="form-control">
+                    {% for game in games %}
+                        <option value="{{ game.id }}">{{ game.name }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <input class="form-control" placeholder="Nombre" name="title"/>
+                <br>
+                <textarea class="form-control" placeholder="Descripcion" name="description"></textarea>
+                <br>
+                <input class="form-control" placeholder="Imagen" name="image"/>
+                <br>
+                <input class="form-control" placeholder="Vacantes" name="vacancies"/>
+                <br>
+                <select name="team_require" class="form-control">
+                    <option value="0">Individual</option>
+                    <option value="1">Por equipos</option>
+                </select>
+                <br>
+                <input class="form-control" placeholder="Comienzo (timestamp)" name="start_at"/>
+                <br>
+                <a href="http://www.epochconverter.com/" target="_BLANK">Conocer timestamps</a>
+                <br>
+                <button type="submit" name="flag" value="save" class="btn btn-default">Guardar</button>
+            </form>
+        </div>
+
+    </div>
+{% endblock content %}

@@ -1,0 +1,200 @@
+{% set this = get_instance() %}
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="es"> <![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8" lang="es"> <![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9" lang="es"> <![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js" lang="es"><!--<![endif]-->
+    <head>
+        {% block meta %}
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+            <meta name="description" content="">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        {% endblock meta %}
+        <title>E-Stadio{% if page_title is defined %} | {{ page_title }}{% endif %}</title> 
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/ico/favicon144x144.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/ico/favicon114x114.png">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/ico/favicon72x72.png">
+        <link rel="apple-touch-icon-precomposed" sizes="57x57" href="/ico/favicon57x57.png">
+        <link rel="shortcut icon" href="/ico/favicon.png">   
+        {% block styles %}
+            <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+            <link rel="stylesheet" href="/css/font-awesome.min.css"/>
+            <link rel="stylesheet" href="/css/summernote.css"/>
+            <link rel="stylesheet" href="/css/main.css"/>
+        {% endblock styles %}
+        <script src="/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+    </head>
+    <body class="{% if page_name is defined %}{{ page_name }}{% endif %}">
+        <!--[if lt IE 7]>
+            <div class="alert alert-warning">Estás usando un navegador obsoleto. Por favor <a href="http://browsehappy.com/">actualizá tu navegador</a> para mejorar la experiencia de navegación.</div>
+        <![endif]-->
+        {% if this.internal.there_are_messages('danger') %}
+        <div class="alert alert-danger alert-dismissable top-alert">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <div class="container-fluid">
+            {% for message in this.internal.pop_messages('danger') %}
+                <p>{{ message|raw }}</p>
+            {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% if this.internal.there_are_messages('warning') %}
+        <div class="alert alert-warning alert-dismissable top-alert">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <div class="container-fluid">
+            {% for message in this.internal.pop_messages('warning') %}
+                <p>{{ message }}</p>
+            {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% if this.internal.there_are_messages('success') %}
+        <div class="alert alert-success alert-dismissable top-alert">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <div class="container-fluid">
+            {% for message in this.internal.pop_messages('success') %}
+                <p>{{ message|raw }}</p>
+            {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% if this.internal.there_are_messages('info') %}
+        <div class="alert alert-info alert-dismissable top-alert">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <div class="container-fluid">
+            {% for message in this.internal.pop_messages('info') %}
+                <p>{{ message|raw }}</p>
+            {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <nav class="navbar navbar-custom navbar-static" role="navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">
+                        <img alt="Brand" src="/img/logo.png">
+                    </a>
+                </div>
+                <div class="collapse navbar-collapse bs-example-js-navbar-collapse">
+                    <ul class="nav navbar-nav navbar-left">                                    
+                        <li><a href="/"><i class="fa fa-home fa-1x"></i> Inicio</a></li>
+                        <li class="dropdown">
+                            <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Juegos <span class="caret"></span></a>
+                            <div class="dropdown-menu dropdown-box" role="menu" aria-labelledby="login">
+
+                            </div>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Torneos <span class="caret"></span></a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="torneos">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="/torneos/proximos.html">Próximos</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="/torneos/vigentes.html">Vigentes</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="/torneos/finalizados.html">Finalizados</a></li>
+                            </ul>
+                        </li>
+                        {#
+                        <li><a href="/e-shop">E-Shop</a></li>
+                        <li><a href="#">Foro</a></li>
+                        #}
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if is_logged() %}
+                            <li id="user-drop" class="dropdown">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"><div id="thumb-user" class="img-circle overflow-hidden"><div class="wrap-table"><div class="vert-middle"><img src="{{ (get_user().image == '')?'/img/user_default_image.png':get_user().image }}"/></div></div></div>{{ get_user().username }} (<strong>{{ get_user().points }}</strong>ptos) <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu" aria-labelledby="user">
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/perfil/datos.html">Perfil</a></li>                                                
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/compras/puntos.html">Cargar Puntos</a></li>
+                                    <li role="presentation" class="divider"></li>
+                                    <li role="presentation"><a role="menuitem" tabindex="-1" href="/logout.html">Salir</a></li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <li class="dropdown">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Registrarse <span class="caret"></span></a>
+                                <div class="dropdown-menu dropdown-box" role="menu" aria-labelledby="login">
+                                    <form role="form" action="/registrarse.html" method="POST">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="newusername" name="newusername" placeholder="Usuario"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="email" name="email" placeholder="Email"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control" id="newpassword" name="newpassword" placeholder="Contraseña"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control" id="repassword" name="repassword" placeholder="Repetir Contraseña"/>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-block" name="flag" value="register">Registrar</button>
+                                    </form>
+                                </div>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Login <span class="caret"></span></a>
+                                <div class="dropdown-menu dropdown-box" role="menu" aria-labelledby="login">
+                                    <form role="form" action="/login.html" method="POST">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="username" name="username" placeholder="Usuario o Email"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña"/>
+                                        </div>
+                                        <div class="checkbox">
+                                            <label><input type="checkbox" id="rememberme" name="rememberme"/> Recordarme</label>
+                                        </div>
+                                        <p class="help-block"><a href="">Olvidé mi contraseña!</a></p>
+                                        <button type="submit" class="btn btn-success btn-block" name="flag" value="login">Ingresar</button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% block content_wo_banner %}
+    <main class="container-fluid">
+        <div class="row">
+            <div class="col-sm-9">
+            {% block content %}{% endblock content %}
+            </div>
+            <div class="col-sm-3 hidden-xs hidden-print">
+                <a class="twitter-timeline" href="https://twitter.com/LeagueOfLegends" data-widget-id="530133237838790656">Tweets por @LeagueOfLegends</a>
+                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                
+                <br/>
+                
+                <div id="fb-root"></div>
+                <script>(function(d, s, id) {
+                  var js, fjs = d.getElementsByTagName(s)[0];
+                  if (d.getElementById(id)) return;
+                  js = d.createElement(s); js.id = id;
+                  js.src = "//connect.facebook.net/es_LA/sdk.js#xfbml=1&appId=1522300184682398&version=v2.0";
+                  fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));</script>
+                <div class="fb-like-box" data-href="https://www.facebook.com/leagueoflegends" data-colorscheme="light" data-show-faces="true" data-header="false" data-stream="true" data-show-border="true"></div>
+                
+             </div>
+        </div>
+    </main>
+    {% endblock content_wo_banner %}
+    {% block scripts %}
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="/js/vendor/jquery-1.11.1.min.js"><\/script>')</script>
+        <script src="/js/vendor/bootstrap.min.js"></script>
+        <script src="/js/plugins.js"></script>
+        <script src="/js/main.js"></script>
+        <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-51865213-2', 'auto');
+            ga('send', 'pageview');
+
+        </script>
+    {% endblock scripts %}
+</body>
+</html>

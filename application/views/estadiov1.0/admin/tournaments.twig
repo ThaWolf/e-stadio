@@ -1,0 +1,126 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box">
+                <h4>TORNEOS</h4>
+                <div class="box-inner">
+                    {% if total_pages > 1 %}
+                    <nav class="pull-right">
+                        <ul class="pagination vert-spacer">
+                            <li class="{% if current_page == 1 %}disabled{% endif %}"><a href="?{{ set_get_params({'pag': current_page - 1}) }}"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>
+                            {% for page in do_pagination(current_page, total_pages, 2) %}
+                            {% if page %}
+                                {% if page == current_page %}
+                                <li class="active"><span>{{ page }}<span class="sr-only"> (current)</span></span></li>
+                                {% else %}
+                                <li><a href="?{{ set_get_params({'pag': page}) }}">{{ page }}</a></li>
+                                {% endif %}
+                            {% else %}
+                                <li class="disabled"><span>...</span></li>
+                            {% endif %}
+                            {% endfor %}
+                            <li class="{% if current_page == total_pages %}disabled{% endif %}"><a href="?{{ set_get_params({'pag': current_page + 1}) }}"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    <a href="/admin/torneos/nuevo" class="pull-left btn btn-custom"><i class="fa fa-plus fa-spacer-right"></i>Crear Torneo</a>
+                    <form method="get" role="form" class="form-inline pull-right bottom-spacer clear-inputs">
+                        <select name="status" class="form-control">
+                            <option value=""> -- Estado</option>
+                            <option value="actives"{% if this.input.get('status') == 'actives' %} selected="selected"{% endif %}>Activos</option>
+                            <option value="coming"{% if this.input.get('status') == 'coming' %} selected="selected"{% endif %}>Próximos</option>
+                            <option value="finished"{% if this.input.get('status') == 'finished' %} selected="selected"{% endif %}>Finalizados</option>
+                        </select>
+                        <select name="game" class="form-control">
+                            <option value=""> -- Juego</option>
+                            {% for game in games %}
+                            <option value="{{ game.id }}"{% if this.input.get('game') == game.id %} selected="selected"{% endif %}>{{ game.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="mode" class="form-control">
+                            <option value=""> -- Modo</option>
+                            <option value="alone"{% if this.input.get('mode') == 'alone' %} selected="selected"{% endif %}>Individual</option>
+                            <option value="team"{% if this.input.get('mode') == 'team' %} selected="selected"{% endif %}>Por Equipos</option>
+                        </select>
+                        <select name="problem" class="form-control">
+                            <option value=""> -- Problema</option>
+                            <option value="yes"{% if this.input.get('problem') == 'yes' %} selected="selected"{% endif %}>Si</option>
+                            <option value="no"{% if this.input.get('problem') == 'no' %} selected="selected"{% endif %}>No</option>
+                        </select>
+                        <select name="limit" class="form-control">
+                            <option value="">De a 10</option>
+                            <option value="20"{% if this.input.get('limit') == '20' %} selected="selected"{% endif %}>De a 20</option>
+                            <option value="50"{% if this.input.get('limit') == '50' %} selected="selected"{% endif %}>De a 50</option>
+                            <option value="100"{% if this.input.get('limit') == '100' %} selected="selected"{% endif %}>De a 100</option>
+                        </select>
+                        <button class="btn btn-custom" type="submit"><i class="fa fa-filter"></i></button>
+                    </form>
+                    <table class="table table-bordered table-hover table-condensed table-responsive table-striped">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="text-center"><i class="fa fa-bars"></i></th>
+                                <th class="text-center">#</th>
+                                <th>Nombre</th>
+                                <th>Capacidad</th>
+                                <th>Modo</th>
+                                <th>Juego</th>
+                                <th>Ronda</th>
+                                <th>Comienzo</th>
+                                <th>Finalización</th>
+                                <th>Creación</th>
+                                <th>Problema</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for tournament in tournaments %}
+                            <tr>
+                                <td class="text-center"><a href="/admin/torneos/editar/{{ tournament.id }}"><i class="fa fa-edit"></i></a></td>
+                                <td class="text-center"><a href="/torneo/{{ tournament.id }}/{{ text_normalize(tournament.name) }}.html" target="_BLANK"><i class="fa fa-external-link"></i></a></td>
+                                <td>{{ tournament.id }}</td>
+                                <td>{{ tournament.name }}</td>
+                                <td class="text-center">{{ tournament.vacancies }}</td>
+                                <td>{% if tournament.team_require %}Por equipos{% else %}Individual{% endif %}</td>
+                                <td>{{ tournament.game_name }}</td>
+                                <td>{% if tournament.settings.round is defined %}{{ tournament.settings.round }}{% else %}Todavía no comenzó{% endif %}</td>
+                                <td>{{ tournament.start_at|date('d/m/Y H:i') }}</td>
+                                <td>{% if tournament.ends_at is not null %}{{ tournament.ends_at|date('d/m/Y H:i') }}{% else %}Todavía no finalizó{% endif %}</td>
+                                <td>{{ tournament.created_at|date('d/m/Y H:i') }}</td>
+                                <td>{% if tournament.problem is null and tournament.match_problem is null %}No{% elseif tournament.problem is not null %}{{ tournament.problem }}{% else %}En algún partido{% endif %}</td>
+                            </tr>
+                        {% else %}
+                            <tr class="info text-center bold">
+                                <td colspan="12">No se encontraron</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if total_pages > 1 %}
+                    <nav class="pull-right">
+                        <ul class="pagination vert-spacer">
+                            <li class="{% if current_page == 1 %}disabled{% endif %}"><a href="?{{ set_get_params({'pag': current_page - 1}) }}"><span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span></a></li>
+                            {% for page in do_pagination(current_page, total_pages, 2) %}
+                            {% if page %}
+                                {% if page == current_page %}
+                                <li class="active"><span>{{ page }}<span class="sr-only"> (current)</span></span></li>
+                                {% else %}
+                                <li><a href="?{{ set_get_params({'pag': page}) }}">{{ page }}</a></li>
+                                {% endif %}
+                            {% else %}
+                                <li class="disabled"><span>...</span></li>
+                            {% endif %}
+                            {% endfor %}
+                            <li class="{% if current_page == total_pages %}disabled{% endif %}"><a href="?{{ set_get_params({'pag': current_page + 1}) }}"><span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span></a></li>
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content_page %}

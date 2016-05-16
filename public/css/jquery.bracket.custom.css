@@ -1,0 +1,139 @@
+div.jQBracket *{
+    transition: all 0.3s ease;
+}
+/* ROUND */
+div.jQBracket .round{
+    width: 200px;
+}
+/* MATCH */
+div.jQBracket .teamContainer{
+    padding-top: 1px;
+}
+/* LINK */
+div.jQBracket .teamContainer .link{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    line-height: 78px;
+    background-color: rgba(171, 37, 55, 0.6);
+    text-align: center;
+    display: none;
+    z-index: 10;
+    border-radius: 4px;
+}
+div.jQBracket .teamContainer:hover .link{
+    display: block;
+}
+div.jQBracket .teamContainer .link a{
+    font-weight: 600;
+    color: #ffffff;
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-decoration: none;
+}
+/* TEAM */
+div.jQBracket .team{
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0;
+    padding-right: 50px;
+    background-color: #f7f7f9;
+    border: 1px solid #e1e1e8;
+    margin-top: -1px;
+    z-index: 1;
+}
+div.jQBracket .team:first-child{
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+div.jQBracket .team:first-child + .team{
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+div.jQBracket .team:hover{    
+    z-index: 2;
+}
+div.jQBracket .team div.label,
+div.jQBracket .team div.label a,
+div.jQBracket .team div.score,
+div.jQBracket .team div.score a{
+    color: #666666;
+    font-weight: 400;
+    height: 100%;
+    display: block;
+    text-decoration: none;
+}
+div.jQBracket .team div.label{
+    position: static;
+    float: none;
+    width: 100%;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+    font-family: 'Lato';
+    font-size: 14px;
+    line-height: 38px;
+}
+div.jQBracket .team div.label{
+    padding-left: 10px;
+}
+div.jQBracket .team div.score{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 50px;
+    text-align: center;
+    font-family: 'Oswald';
+    font-size: 20px;
+    line-height: 33px;
+}
+/* HIGHLIGHT WINNER */
+div.jQBracket .team.highlightWinner{
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+div.jQBracket .team.highlightWinner .label,
+div.jQBracket .team.highlightWinner .score{
+    color: #31708f;  
+}
+/* HIGHLIGHT */
+div.jQBracket .team.highlight{
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+div.jQBracket .team.highlight .label,
+div.jQBracket .team.highlight .score{
+    color: #3c763d;    
+}
+/* NA */
+div.jQBracket .team.na{
+    background-color: #ffffff;
+    border-color: #eeeeee;
+}
+div.jQBracket .team.highlight .label,
+div.jQBracket .team.highlight .score{
+    color: #333333;    
+}
+div.jQBracket .team.na.highlight{
+    background-color: #fafafa;
+}
+/* CONECTOR */
+div.jQBracket .connector{
+    border-color: #e1e1e8;
+}
+div.jQBracket .connector.highlight{
+    border-color: #d6e9c6;
+}
+div.jQBracket .connector.highlightWinner, 
+div.jQBracket .connector div.connector.highlightWinner{
+    border-color: #bce8f1;
+}
+div.jQBracket .connector.na{
+    border-color: #eeeeee;
+} 
+/* BUBBLE */
+div.jQBracket .bubble{
+    top: 10px;
+}

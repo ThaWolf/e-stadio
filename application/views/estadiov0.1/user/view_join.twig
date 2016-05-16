@@ -1,0 +1,80 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+
+{% block content_wo_banner %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-4 col-sm-offset-1">
+                <fieldset>
+                    <legend>Registrarse</legend>
+                    {% if register_error is defined %}
+                    <div class="alert alert-danger">
+                        {{ register_error }}
+                    </div>
+                    {% endif %}
+                    <form role="form" action="/registrarse.html" method="POST">
+                        <div class="form-group">
+                            <label for="newusername">Usuario</label>
+                            <input type="text" class="form-control" id="newusername" name="newusername" placeholder="Usuario" value="{{ this.input.post('newusername') }}"/>
+                            {% if form_error('newusername')|length > 0 %}
+                            <div class="help-block alert alert-danger">{{ form_error('newusername')|raw }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="useemailrname">Email</label>
+                            <input type="text" class="form-control" id="email" name="email" placeholder="Email" value="{{ this.input.post('email') }}"/>
+                            {% if form_error('email')|length > 0 %}
+                            <div class="help-block alert alert-danger">{{ form_error('email')|raw }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="newpassword">Contraseña</label>
+                            <input type="password" class="form-control" id="newpassword" name="newpassword" placeholder="Contraseña"/>
+                            {% if form_error('newpassword')|length > 0 %}
+                            <div class="help-block alert alert-danger">{{ form_error('newpassword')|raw }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="repassword">Repetir Contraseña</label>
+                            <input type="password" class="form-control" id="repassword" name="repassword" placeholder="Repetir Contraseña"/>
+                            {% if form_error('repassword')|length > 0 %}
+                            <div class="help-block alert alert-danger">{{ form_error('repassword')|raw }}</div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary" name="flag" value="register">Registrar</button>
+                    </form>
+                </fieldset>
+            </div>
+            <div class="col-sm-4 col-sm-offset-1">
+                <fieldset>
+                    <legend>Ingresar</legend>
+                    {% if login_error is defined %}
+                    <div class="alert alert-danger">
+                        {{ login_error }}
+                    </div>
+                    {% endif %}
+                    <form role="form" action="/login.html" method="POST">
+                        <div class="form-group">
+                            <label for="username">Usuario o Email</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Usuario o Email" value="{{ this.input.post('username') }}"/>
+                            {% if form_error('username')|length > 0 %}
+                            <div class="help-block alert alert-danger">{{ form_error('username')|raw }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña"/>
+                            {% if form_error('password')|length > 0 %}
+                            <div class="help-block alert alert-danger">{{ form_error('password')|raw }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" id="rememberme" name="rememberme"/> Recordarme</label>
+                        </div>
+                        <p class="help-block"><a href="">Olvidé mi contraseña!</a></p>
+                        <button type="submit" class="btn btn-success" name="flag" value="login">Ingresar</button>
+                    </form>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+{% endblock content_wo_banner %}

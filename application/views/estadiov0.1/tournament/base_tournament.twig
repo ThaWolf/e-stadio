@@ -1,0 +1,77 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-4">
+            <img class="thumbnail" src="{{ tournament.image }}"/>
+            <table class="table table-condensed table-responsive table-striped table-bordered table-hover">
+                <tbody>
+                    <tr>
+                        <td>Nombre</td>
+                        <th>{{ tournament.title }}</th>
+                    </tr>
+                    {% if tournament.data.first_place is defined %}
+                    <tr>
+                        <td>1<sup>er</sup> puesto</td>
+                        <th><a href="{{ tournament.data.first_place.link }}">{{ tournament.data.first_place.name }}</a></th>
+                    </tr>
+                    {% endif %}
+                    {% if tournament.data.second_place is defined %}
+                    <tr>
+                        <td>2<sup>do</sup> puesto</td>
+                        <th><a href="{{ tournament.data.second_place.link }}">{{ tournament.data.second_place.name }}</a></th>
+                    </tr>
+                    {% endif %}
+                    {% if tournament.data.third_place is defined %}
+                    <tr>
+                        <td>3<sup>er</sup> puesto</td>
+                        <th><a href="{{ tournament.data.third_place.link }}">{{ tournament.data.third_place.name }}</a></th>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td>Juego</td>
+                        <th>{{ tournament.game_name }}</th>
+                    </tr>
+                    <tr>
+                        <td>Modo</td>
+                        <th>{% if tournament.team_require %}Por equipos{% else %}Individual{% endif %}</th>
+                    </tr>
+                    <tr>
+                        <td>Costo</td>
+                        <th>{{ tournament.price }}</th>
+                    </tr>
+                    <tr>
+                        <td>Premio</td>
+                        <th>{{ tournament.loot }}</th>
+                    </tr>
+                    <tr>
+                        <td>Comienzo</td>
+                        <th>{{ tournament.start_at|date('d/m/Y') }}</th>
+                    </tr>
+                    <tr>
+                        <td>Estado</td>
+                        <th>
+                            {% if tournament.ends_at is not null %}
+                                <span class="text-danger">Finalizado</span>
+                            {% elseif tournament.start_at <= 'now'|date('U') %}
+                                <span class="text-success">En Juego</span>
+                            {% elseif tournament.participants|length == tournament.vacancies %}
+                                <span class="text-warning">En Espera</span>
+                            {% else %}
+                                <span class="text-info">Inscripciones</span>
+                            {% endif %}
+                        </th>
+                    </tr>
+                    <tr>                        
+                        <td>Inscriptos</td>
+                        <th>{{ tournament.participants|length }} de {{ tournament.vacancies }}</th>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="well well-sm">{{ tournament.description }}</div>
+        </div>
+        <div class="col-sm-8">
+        {% block tournament_info %}{% endblock tournament_info %}
+        </div>
+    </div>
+{% endblock content %}

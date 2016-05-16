@@ -1,0 +1,120 @@
+{% extends constant('THEME_NAME')~'/user/base_profile.twig' %}
+
+{% block info %}
+    <fieldset>
+        <legend>Imagen</legend>
+        <div class="row">
+            <div class="col-sm-5">
+                <div class="img-rounded">
+                    <img src="{{ (get_user().image == '')?'/img/user_default_image.png':get_user().image }}"/>
+                </div>
+            </div>
+            <div class="col-sm-7">
+                <form method="post" role="form" class="form-inline">
+                    <input type="text" name="url" value="{{ get_user().image }}" placeholder="URL de la imagen" class="form-control"/>
+                    <button type="submit" class="btn btn-default pull-right" name="flag" value="save_image">Guardar</button>
+                </form>
+                <hr/>
+                <form method="post" role="form" class="form-inline" enctype="multipart/form-data">
+                    <input type="file" name="userfile"/>
+                    <br/>
+                    <button type="submit" class="btn btn-default pull-right" name="flag" value="upload_image">Subir y Guardar</button>
+                </form>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Mis Datos</legend>
+        {% if data_error is defined %}
+        <div class="alert alert-danger">
+            {{ data_error }}
+        </div>
+        {% endif %}
+        <form role="form" method="POST">
+            <div class="row">                
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>Usuario</label>
+                        <div class="form-control disabled">{{ profile.username }}</div>
+                    </div>   
+                </div>                          
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <div class="form-control disabled">{{ profile.email }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="first_name">Nombre</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Nombre" value="{{ profile.first_name }}"/>
+                        {% if form_error('first_name')|length > 0 %}
+                        <div class="help-block alert alert-danger">{{ form_error('first_name')|raw }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="dni">Número de Documento</label>
+                        <input type="text" class="form-control" id="dni" name="dni" placeholder="Documento" value="{{ profile.dni }}"/>
+                        {% if form_error('dni')|length > 0 %}
+                        <div class="help-block alert alert-danger">{{ form_error('dni')|raw }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="last_name">Apellido</label>
+                        <input type="text" class="form-control" id="first_name" name="last_name" placeholder="Apellido" value="{{ profile.last_name }}"/>
+                        {% if form_error('last_name')|length > 0 %}
+                        <div class="help-block alert alert-danger">{{ form_error('last_name')|raw }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-default pull-right" name="flag" value="save">Guardar Datos</button>
+        </form>
+    </fieldset>
+    <fieldset>
+        <legend>Cambiar Email</legend>
+        <form role="form" method="POST">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="email">Nuevo Email</label>
+                        <input type="text" class="form-control" id="email" name="email" placeholder="Email"/>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-default pull-right" name="flag" value="change_email">Cambiar Email</button>
+        </form>
+    </fieldset>
+    <fieldset>
+        <legend>Cambiar Contraseña</legend>
+        <form role="form" method="POST">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="oldpassword">Contraseña Actual</label>
+                        <input type="password" class="form-control" id="oldpassword" name="oldpassword" placeholder="Contraseña Actual"/>
+                    </div>
+                </div>
+            </div>            
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="newpassword">Contraseña Nueva</label>
+                        <input type="password" class="form-control" id="newpassword" name="newpassword" placeholder="Nueva Contraseña"/>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="renewpassword">Repetir Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="renewpassword" name="renewpassword" placeholder="Repetir Contraseña"/>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-default pull-right" name="flag" value="change_password">Cambiar Contraseña</button>
+        </form>
+    </fieldset>
+{% endblock info %}

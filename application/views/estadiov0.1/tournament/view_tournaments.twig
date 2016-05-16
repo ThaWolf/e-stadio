@@ -1,0 +1,33 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block scripts %}
+    {{ parent() }}
+    <script>
+    $(document).ready(function(){
+        $(window).load(function(){            
+            $('#tournaments-container').masonry({
+                itemSelector: '.tournament-box'
+            });
+        });
+    });
+    </script>
+{% endblock scripts %}
+{% block content %}
+<div class="row">
+    <div id="tournaments-container" class="col-sm-12">
+    {% for tournament in tournaments %}
+        <div class="panel panel-{{ tournament_class }} tournament-box {% if tournament.team_require %}team{% else %}solo{% endif %} weight{{ tournament.weight }} game-{{ tournament.game_id }}">
+            <div class="panel-heading"><a href="/torneos/{{ tournament.id }}/{{ text_normalize(tournament.title) }}.html" class="text-{{ tournament_class }}">{{ tournament.title }}</a></div>
+            <div class="panel-body">
+                <img src="{{ tournament.image }}"/>
+                <p>{{ tournament.description }}</p>
+            </div>
+            <div class="panel-footer">
+                Inscripción <strong>{% if tournament.team_require %}por equipos{% else %}individual{% endif %}</strong>
+            </div>
+        </div>
+    {% else %}
+    <div class="alert alert-info">No hay torneos para mostrar.</div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock content %}

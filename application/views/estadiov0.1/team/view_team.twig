@@ -1,0 +1,87 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="img-rounded">
+                <img class="full-width img-thumbnail" src="{{ (team.image == '')?'/img/team_default_image.png':team.image }}"/>
+            </div>
+            {% if team.user_id == get_user().id %}
+                <br/>
+                <form method="post" role="form">
+                    <input type="text" name="url" value="{{ team.image }}" placeholder="URL de la imagen" class="form-control"/>
+                    <br/>
+                    <button type="submit" class="btn btn-default" name="flag" value="save_image">Guardar</button>
+                </form>
+                <hr/>
+                <form method="post" role="form" enctype="multipart/form-data">
+                    <input type="file" name="userfile"/>                    
+                    <br/>
+                    <button type="submit" class="btn btn-default" name="flag" value="upload_image">Subir y Guardar</button>
+                </form>
+                <br/>
+            {% endif %}
+        </div>                
+        <div class="{% if is_member %}col-sm-5{% else %}col-sm-8{% endif %}"> 
+            {% if team.user_id == get_user().id %}
+            <form method="POST" role="form" class="form-inline">
+                <input type="text" class="form-control" name="username" placeholder="Nombre de Usuario"/>
+                <button class="btn btn-default" type="submit" name="flag" value="send_request">Enviar Invitación</button>
+            </form>
+            <br/>
+            {% endif %}
+            <fieldset>
+                <legend>Miembros</legend>
+                <ul class="nav nav-pills nav-stacked">
+                    {% for member in team.members %}
+                        <li class="clearfix">
+                        	
+                            {{ member.username }}
+                            {% if team.user_id == member.id %}
+                                <span class="pull-right bold text-warning">Capitán</span>
+                            {% elseif team.user_id == get_user().id %}
+                                <form class="pull-right" method="POST" role="form">
+                                    <input type="hidden" name="user_id" value="{{ member.id }}"/>
+                                    <button type="submit" class="btn btn-warning btn-smallest" name="flag" value="ascend_as_captain">Nombrar Capitán</button>
+                                    <button type="submit" class="btn btn-danger btn-smallest" name="flag" value="remove_member"><i class="fa fa-times"></i></button>
+                                </form>
+                            {% elseif member.id == get_user().id %}
+                                 <form class="pull-right" method="POST" role="form">
+                                    <button type="submit" class="btn btn-danger btn-smallest" name="flag" value="leave"><i class="fa fa-times"></i></button>
+                                </form>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </fieldset>
+            {% if is_member %}
+            <br/>
+            <fieldset>
+                <legend>Solicitudes Pendientes</legend>
+                {% if team.requests|length > 0 %}
+                <ul class="nav nav-pills nav-stacked">
+                    {% for request in team.requests %}
+                        <li class="clearfix">
+                            Hay una solicitud para <strong>{{ request.username }}</strong>
+                            {% if team.user_id == get_user().id %}
+                                <form class="pull-right" method="POST" role="form">
+                                    <input type="hidden" name="user_id" value="{{ request.id }}"/>
+                                    <button type="submit" class="btn btn-danger btn-smallest" name="flag" value="remove_request"><i class="fa fa-times"></i></button>
+                                </form>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <div class="alert alert-info">No hay solicitudes pendientes</div>
+                {% endif %}
+            </fieldset>
+            {% endif %}
+        </div>
+        {% if is_member %}
+        <div class="col-sm-3">
+            <div class="alert alert-info">El equipo no tiene notificaciones</div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock content %}

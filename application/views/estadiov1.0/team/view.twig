@@ -1,0 +1,173 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+<div class="row">    
+    <div class="col-sm-3">
+        <div class="thumb-container">
+            <img class="thumbnail" src="{{ get_image(team.image) }}">
+            <div class="thumb-description">
+                <h5 class="text-center thumb-title">{{ team.name|upper }}</h5>
+            </div>
+            {% if team.iamcaptain %}
+            {{ get_image_form('/ajax_team_update_image/'~team.id,team.image)|raw }}
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-sm-6">
+    	<div class="page-title text-uppercase">
+    		
+                <div class="box-inner pull-right" style="width: 40px; padding: 2px;">
+                   {% if team.iamcaptain %}
+                   <div><h6>Eliminar Equipo</h6></div>
+                    <form method="post" action="/ajax_delete_team" class="ajax-form password">
+                        <div class="input-group">
+                            <input type="hidden" name="team_id" value="{{ team.id }}"/>
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-danger"><i class="fa fa-times"></i></button>
+                            </span>
+                        </div>
+                    </form>
+                    {% endif %}
+                 </div>
+                 <h1>{{ team.name }}</h1>
+		</div>
+		<div class="box vert-spacer">
+            <h4>Miembros <a href="#" class="box-collapse-btn pull-right lh-h4"><i class="fa fa-angle-double-down off"></i><i class="fa fa-angle-double-up on"></i></a></h4>
+            <div class="box-inner">                
+                <table class="table-data">
+                    <tbody>
+                    {% set counter = 1 %}
+                    {% for member in team.members %}
+                    	<tr>
+	                        <td class="bold">
+                                {% if team.user_id == member.id %}Capitan:
+                                {% else %}
+                                    {% if (member.id == sup1_id) or (member.id == sup2_id)%}
+                                        {% if member.id == sup1_id %}
+                                            {% if member.id == sup1_id %}
+                                                Suplente 1:
+                                            {% else %}
+                                                Jugador {{ counter }}:   
+                                                {% set counter = counter + 1 %}                                      
+                                            {% endif %}
+                                        {% endif %}
+                                        {% if (member.id == sup2_id) %}
+                                            {% if member.id == sup2_id %}
+                                                Suplente 2:
+                                            {% else %}
+                                                Jugador {{ counter }}:
+                                                {% set counter = counter + 1 %} 
+                                            {% endif %}
+                                        {% endif %}
+                                    {% else %}
+                                        Jugador {{ counter }}:  
+                                        {% set counter = counter + 1 %}                                                                          
+                                    {% endif %}
+
+                                    
+                                {% endif %}
+                                </td>
+                                {% if (team.iamcaptain) and (member.id != team.user_id) %}
+	                            <td class="pull-right"><a href="/perfil/{{ member.username }}.html">{{ member.username }}</a>
+                                        <form method="post" action="/ajax_assign_captain" class="ajax-form password team-lead-member-delete">
+                                            <div class="input-group">
+                                                <input type="hidden" name="team_id" value="{{ team.id }}"/>
+                                                <input type="hidden" name="user_id" value="{{ member.id }}"/>
+                                                <span>
+                                                    <button type="submit" class="btn btn-info"><img src="/images/cp.png"></button>
+                                                </span>
+                                            </div>
+                                        </form>   
+
+                                        {% if ( members_count >= ( team_limit) -1 ) %}
+                                            <form method="post" action="/ajax_set_sup1" class="ajax-form confirm team-lead-member-delete">
+                                                <div class="input-group{% if sup1_id == member.id %} disabled {% endif %}">
+                                                    <input type="hidden" name="team_id" value="{{ team.id }}"/>
+                                                    <input type="hidden" name="user_id" value="{{ member.id }}"/>
+                                                    <span>
+                                                        <button type="submit" class="btn btn-warning"{% if sup1_id == member.id %} disabled {% endif %}><img src="/images/sup1.png"></button>
+                                                    </span>
+                                                </div>
+                                            </form>    
+                                            <form method="post" action="/ajax_set_sup2" class="ajax-form confirm team-lead-member-delete">
+                                                <div class="input-group{% if sup2_id == member.id %} disabled {% endif %}">
+                                                    <input type="hidden" name="team_id" value="{{ team.id }}"/>
+                                                    <input type="hidden" name="user_id" value="{{ member.id }}"/>
+                                                    <span>
+                                                        <button type="submit" class="btn btn-warning"{% if sup2_id == member.id %} disabled {% endif %}><img src="/images/sup2.png"></button>
+                                                    </span>
+                                                </div>
+                                            </form>                                                                             
+                                        {% endif %}
+                                        <form method="post" action="/ajax_remove_membership" class="ajax-form password team-lead-member-delete">
+                                            <div class="input-group">
+                                                <input type="hidden" name="team_id" value="{{ team.id }}"/>
+                                                <input type="hidden" name="user_id" value="{{ member.id }}"/>
+                                                <span>
+                                                    <button type="submit" class="btn btn-danger"><i class="fa fa-times"></i></button>
+                                                </span>
+                                            </div>
+                                        </form>
+                                
+                            </td>
+                            {% else %}
+                            <td class="pull-right"><a href="/perfil/{{ member.username }}.html">{{ member.username }}</a>                            
+                            {% endif %}
+	                    </tr>                
+	                 {% endfor %} 
+            		</tbody>
+            	</table>                     
+            </div>
+        </div>
+        <!--{{ dump(team) }} -->
+    </div> 
+    <div class="col-sm-3">
+        {% if team.iammember %}
+        <div class="box">
+            <h4>ENVIAR INVITACIÓN</h4>
+            <div class="box-inner">
+                {% if members_count < team_limit %}
+                <form method="post" action="/ajax_send_request" class="ajax-form password">
+                    <div class="input-group">
+                        <input class="form-control" type="text" placeholder="Usuario" name="username"/>
+                        <input type="hidden" name="team_id" value="{{ team.id }}"/>
+                        <span class="input-group-btn">
+                            <button type="submit" class="btn btn-danger"><i class="fa fa-send"></i></button>
+                        </span>
+                    </div>
+                </form>
+                {% else %}
+                <div class="alert alert-info">El equipo está completo</div>
+                {% endif %}
+            </div>
+        </div>
+        {% if members_count < team_limit %}
+        <div class="box vert-spacer">
+            <h4>INVITACIONES</h4>
+            <div class="box-inner">
+                {% for request in team.requests %}
+                <div>
+                    <form method="post" action="/ajax_decline_team_invitation" class="ajax-form password pull-left">
+                        <input type="hidden" name="team_request" value="{{ request.id }}"/>                         
+                        <div class="input-group">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-danger"><i class="fa fa-close"></i></button>
+                            </span>
+                            <div class="form-control"><a href="/perfil/{{ text_normalize(request.username) }}.html">{{ request.username }}</a></div>
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <div class="alert alert-info">No hay</div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}        
+        {% endif %}
+    </div>
+</div>
+{% endblock content_page %}

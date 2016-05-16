@@ -1,0 +1,209 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+    <div class="row">
+        <div class="col-sm-12">            
+            <div class="box">
+                <h4>{{ box_title }}</h4>
+                <div class="box-inner">
+                    <form method="post" class="ajax-form confirm" action="{% if tournament %}/admin/ajax_edit_tournament/{{ tournament.id }}{% else %}/admin/ajax_new_tournament{% endif %}">
+                        <div class="row">
+                            <div class="col-sm-3">                             
+                                <div class="form-group col-sm-12">
+                                    <label>Imagen</label>
+                                    <div class="thumb-container">
+                                        <img class="thumbnail" src="{% if tournament %}{{ get_image(tournament.image) }}{% else %}{{ get_image(constant('DEFAULT_TOURNAMENT_IMAGE')) }}{% endif %}"/>
+                                        <input type="file" class="thumb-file" name="{{ constant('IMAGE_UPLOAD_USERFILE') }}"/>
+                                        <input type="hidden" class="image-id" name="image_id" value="{% if tournament %}{{ tournament.image }}{% else %}{{ constant('DEFAULT_TOURNAMENT_IMAGE') }}{% endif %}"/>
+                                        <div class="loader"><div class="wrap-table"><div class="vert-middle"><i class="fa fa-spin fa-spinner"></i></div></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="form-group col-sm-6">
+                                    <label>Nombre</label>
+                                    <input class="form-control" name="name" placeholder="Nombre" value="{{ tournament.name }}"/>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>Juego</label>
+                                    <select class="form-control" name="game"{% if tournament is defined %} disabled="disabled"{% endif %}>
+                                        {% for game in games %}
+                                            <option value="{{ game.id }}"{% if tournament.game_id == game.id %} selected="selected"{% endif %}>{{ game.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>Fecha</label>
+                                    <input class="form-control" name="date" type="datepicker" placeholder="Fecha" value="{{ tournament.start_at|date('d/m/Y') }}"{% if tournament is defined %} disabled="disabled"{% endif %}/>
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label>Hora</label>
+                                    <select class="form-control" name="hour"{% if tournament is defined %} disabled="disabled"{% endif %}>
+                                        {% for hour in range(0, 23) %}
+                                            <option value="{{ hour }}"{% if tournament.start_at|date('H') == hour %} selected="selected"{% endif %}>{{ substr('0'~hour, -2) }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-3">
+                                    <label>Minuto</label>
+                                    <select class="form-control" name="minute"{% if tournament is defined %} disabled="disabled"{% endif %}>
+                                        <option value="00"{% if tournament.start_at|date('i') == '00' %} selected="selected"{% endif %}>00</option>
+                                        <option value="30"{% if tournament.start_at|date('i') == '30' %} selected="selected"{% endif %}>30</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>Modo</label>
+                                    <select class="form-control" name="mode"{% if tournament is defined %} disabled="disabled"{% endif %}>
+                                        <option value="alone"{% if not tournament.team_require %} selected="selected"{% endif %}>Individual</option>
+                                        <option value="team"{% if tournament.team_require %} selected="selected"{% endif %}>Por equipos</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>Capacidad</label>
+                                    <select class="form-control" name="vacancies"{% if tournament is defined %} disabled="disabled"{% endif %}>
+                                        {% for size in range(3, 6) %}
+                                            <option value="{{ pow(2, size) }}"{% if tournament.vacancies == pow(2, size) %} selected="selected"{% endif %}>{{ pow(2, size) }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label>Descripción</label>
+                                    <textarea class="form-control" name="description" placeholder="Descripción">{{ tournament.description }}</textarea>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <table id="round-times" class="table table-condensed">
+                                    <thead>
+                                    <tr>
+                                        <th class="col-sm-2">Ronda</th>
+                                        <th class="col-sm-3">Días</th>
+                                        <th class="col-sm-4">Horas</th>
+                                        <th class="col-sm-3">Mejor de #</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if tournament %}
+                                        {% for key,round in obj2array(tournament.settings.rounds) %}
+                                        <tr>
+                                            {% set temp_date = explode_timestamp(round.expiration_time) %}
+                                            {% set n_round = str_replace(constant('KEY_DATES_PREFIX'), '', key) %}
+                                            {% if n_round == constant('THIRD_PLACE') %}
+                                                {% set n_round = '3er' %}
+                                            {% endif %}
+                                            <td><div class="form-control">{{ n_round }}</div></td>                       
+                                            <td><div class="form-control">{{ temp_date.days }}</div></td>                 
+                                            <td><div class="form-control">{{ substr('0'~temp_date.hours,-2)~':'~substr('0'~temp_date.minutes,-2) }}</div></td>                
+                                            <td><div class="form-control">{{ round.best_of }}</div></td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        {% for round in range(3, 1) %}
+                                        <tr>
+                                            <td><div class="form-control">{{ round }}</div></td>
+                                            <td>
+                                                <input type="text" value="2" name="rounds[{{ round }}][days]" class="form-control"/>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" name="rounds[{{ round }}][hours]">
+                                                    {% for hour in range(0, 23) %}
+                                                    <option value="{{ hour * 60 * 60 }}">{{ substr('0'~hour, -2) }}:00</option>
+                                                    <option value="{{ (hour * 60 * 60) + 1800 }}">{{ substr('0'~hour, -2) }}:30</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" name="rounds[{{ round }}][best_of]">
+                                                    <option value="1">1</option>
+                                                    <option value="3">3</option>
+                                                    <option value="5">5</option>
+                                                    <option value="7">7</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <td><div class="form-control">3er</div></td>
+                                            <td>
+                                                <input type="text" value="2" name="rounds[{{ constant('THIRD_PLACE') }}][days]" class="form-control"/>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" name="rounds[{{ constant('THIRD_PLACE') }}][hours]">
+                                                    {% for hour in range(0, 23) %}
+                                                    <option value="{{ hour * 60 * 60 }}">{{ substr('0'~hour, -2) }}:00</option>
+                                                    <option value="{{ (hour * 60 * 60) + 1800 }}">{{ substr('0'~hour, -2) }}:30</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" name="rounds[{{ constant('THIRD_PLACE') }}][best_of]">
+                                                    <option value="1">1</option>
+                                                    <option value="3">3</option>
+                                                    <option value="5">5</option>
+                                                    <option value="7">7</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>                                    
+                                </table>
+                            </div>
+                        </div>
+                        <button class="btn btn-custom pull-right" type="submit"><i class="fa fa-save fa-spacer-right"></i>Guardar Torneo</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content_page %}
+
+{% block page_scripts %}
+    {{ parent() }}
+    <script>
+    function make_tr(round, text){
+        
+        if (typeof text === 'undefined'){
+            text = round;
+        }
+        
+        var html = '';
+        html += '<tr>';
+        html += '<td><div class="form-control">'+text+'</div></td>';
+        html += '<td><input type="text" value="2" name="rounds['+round+'][days]" class="form-control"/></td>';
+        html += '<td>';                
+        html += '<select class="form-control" name="rounds['+round+'][hours]">';
+        for (var hour = 0; hour <= 23; hour++){
+            html += '<option value="'+(hour * 3600)+'">'+('0'+hour).substr(-2)+':00</option>';
+            html += '<option value="'+((hour * 3600) + 1800)+'">'+('0'+hour).substr(-2)+':30</option>';
+        }
+        html += '</select>';
+        html += '</td>';        
+        html += '<td>';
+        html += '<select class="form-control" name="rounds['+round+'][best_of]">';
+        html += '<option value="1">1</option>';
+        html += '<option value="3">3</option>';
+        html += '<option value="5">5</option>';
+        html += '<option value="7">7</option>';
+        html += '</select>';
+        html += '</td>';
+        html += '</tr>';
+        return html;
+    }
+    $(document).ready(function(){
+        $('[name="vacancies"]').change(function(){
+            var $rounds_times = $('#round-times tbody');
+            var $rounds = $(this).val();
+            $rounds_times.find('tr').remove();
+            var html = '';
+            for (var round = Math.ceil(Math.log2($rounds)); round >= 1; round--){
+                html += make_tr(round);
+            }
+            html += make_tr('{{ constant('THIRD_PLACE') }}', '3er');
+            $rounds_times.append(html);
+        });
+    });
+    </script>
+{% endblock page_scripts %}

@@ -1,0 +1,218 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+    <div class="row">
+        <div class="col-sm-3">
+            {% if get_date().getTimestamp() < tournament.start_at %}
+                <div id="regresive" class="alert alert-warning bottom-spacer"><i class="fa fa-clock-o fa-spacer-right"></i><span></span></div>
+                <script>
+                var count = {{ tournament.start_at }} - {{ get_date().getTimestamp() }};
+                
+                var counter = setInterval(regresive, 1000); //1000 will  run it every 1 second
+
+                function regresive(){
+                    count--;
+                    var temp_count = count;
+                    var days = Math.floor(temp_count / (3600 * 24));
+                    temp_count = temp_count - (days * 3600 * 24);
+                    var hours = Math.floor(temp_count / 3600);
+                    temp_count = temp_count - (hours * 3600);
+                    var minutes = Math.floor(temp_count / 60);
+                    temp_count = temp_count - (minutes * 60);
+                    if (days > 0){
+                        $('#regresive span').html('En '+days+' días '+('0'+hours).substr(-2)+':'+('0'+minutes).substr(-2)+':'+('0'+temp_count).substr(-2)+'hs');
+                    }
+                    else{
+                        $('#regresive span').html('En '+('0'+hours).substr(-2)+':'+('0'+minutes).substr(-2)+':'+('0'+temp_count).substr(-2)+'hs');
+                    }
+                    if (count <= 0){
+                        clearInterval(counter);
+                        window.location.reload();
+                        //counter ended, do something here
+                        return;
+                    }
+
+                }
+                </script>
+            {% endif %}
+            <div class="thumb-container bottom-spacer">
+                <img class="thumbnail" src="{{ get_image(tournament.image) }}"/>
+                <div class="thumb-description">
+                    <h5 class="text-center thumb-title">{{ tournament.name|upper }}</h5>
+                    <div class="text-center bold">Costo: {{ tournament.price }}p</div>
+                </div>
+            </div>
+            {% if tournament.start_at <= get_date().getTimestamp() %}
+            {# nada #}
+            {% elseif not get_user() %}
+            <div class="alert alert-warning"><i class="fa fa-warning fa-spacer-right"></i>Ingresa al sistema si quieres inscribirte</div>
+            {% elseif tournament.state == 'already_confirmed' %}
+            <div class="alert alert-success">Te encuentras inscripto y confirmado</div>
+            {% elseif tournament.state == 'confirm' %}
+            <form method="post" action="/ajax_tournament_confirm/{{ tournament.id }}" class="ajax-form confirm">
+                <button type="submit" class="btn btn-success btn-block">Confirmar</button>
+            </form>
+            {% elseif tournament.state == 'waiting_to_confirm' %}
+            <div class="alert alert-success">Te encuentras inscripto<br>Espera a la etapa de confirmación</div>
+            {% elseif tournament.state == 'team_inscription' %}
+            <form method="post" action="/ajax_tournament_inscript_team/{{ tournament.id }}" class="ajax-form confirm">
+                <button type="submit" class="btn btn-custom btn-block" data-tournament="{{ tournament.id }}">Inscribir a mi equipo</button>
+            </form>
+            {% elseif tournament.state == 'user_inscription' %}            
+            <form method="post" action="/ajax_tournament_inscript_user/{{ tournament.id }}" class="ajax-form confirm">
+                <button type="submit" class="btn btn-custom btn-block" data-tournament="{{ tournament.id }}">Inscribirse</button>
+            </form>
+            {% elseif tournament.state == 'time_to_confirm' %}
+            <div class="alert alert-info">Etapa de confirmación<br>Estate atento, quizás se libere un lugar</div>
+            {% elseif tournament.state == 'is_full' %}
+            <div class="alert alert-info"><i class="fa fa-danger fa-spacer-right"></i>El torneo alcanzó su cupo máximo<br>No obstante en la etapa de confirmación pueden liberarse cupos</div> 
+            <form method="post" action="/ajax_tournament_subscribe/{{ tournament.id }}" class="ajax-form confirm">
+                <button type="submit" class="btn btn-warning btn-block vert-spacer">Avisarme por mail</button>
+            </form>
+            {% endif %}
+                     
+            <div class="box vert-spacer">
+                <h4>INSCRIPTOS <span class="pull-right">{{ tournament.participants|length }} de {{ tournament.vacancies }}</span></h4>
+                <div class="box-inner">
+                <table class="table table-bordered table-condensed table-hover table-responsive table-striped">
+                {% for participant in tournament.participants %}
+                    <tr>
+                        <td class="{% if participant.confirmed_at is null %}warning{% else %}success{% endif %}"><a href="/{{ tipo }}/{{ text_normalize(participant.id) }}" class="text-default block">{{ participant.show_name }}</a>
+                        {% if (teamuser_id == participant.id) %}
+                            <td class="danger">
+                                <form class="ajax-form password" method="post" action="/ajax_leave_tournament">
+                                    <button class="btn btn-unstyled btn-block text-danger" type="submit"><i class="fa fa-times"></i></button>
+                                    <input type="hidden" name="tid" value="{{ tournament.id }}">
+                                    <input type="hidden" name="tuid" value="{{ teamuser_id }}">
+                                    <input type="hidden" name="tipo" value="{{ tipo }}">
+                                </form>    
+                            </td>
+                        {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td class="alert-info"><i class="fa fa-info-circle fa-spacer-right"></i>No hay</td>
+                    </tr>
+                {% endfor %}
+                </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <div class="page-title">
+                <h4 class="pull-right lh-h1">{{ tournament.game_name|upper }}</h4>
+                <h1>{{ tournament.name|upper }}</h1>
+            </div>
+            
+            <div class="box vert-spacer">
+                <h4>DESCRIPCIÓN</h4>
+                <div class="box-inner pre-line">{{ tournament.description }}</div>
+            </div> 
+            
+            {% if tournament.brackets is not null %} 
+            <div class="box vert-spacer">
+                <h4>BRACKETS</h4>
+                <div class="box-inner">
+                        <div class="brackets-container">
+                            <div id="brackets" class="brackets"></div>
+                            <div class="brackets-loader"><i class="fa fa-spin fa-spinner"></i></div>
+                        </div>
+                </div>
+            </div>            
+            {% endif %}
+        </div>
+    </div>
+{% endblock content_page %}
+
+{% block page_scripts %}
+    {{ parent() }}
+    {% if tournament.view is defined %}
+    <script>
+        {#function render_fn(container, data, score) {
+            if (!data.slug || !data.name)
+              return
+            if (typeof data.slug === 'undefined'){
+                container.append(data.name);
+            }
+            else{
+                container.append('<a href="/perfil/'+data.slug+'.html">'+data.name+'</a>');
+            }
+          }
+          function edit_fn(container, data, doneCb) {
+            var input = $('<input type="text">')
+            input.val(data.name);
+            container.html(input);
+            input.focus();
+            input.blur(function() { doneCb({flag: data.flag, name: input.val()}) });
+          }#}
+ 
+        $(document).ready(function(){
+            var minimalData =  {
+                teams : {{ tournament.view.couples|raw }},
+                results : {{ tournament.view.results|raw }}
+            }
+            var matchIDs = {{ tournament.view.ids|raw }};
+            $(function() {
+                $('#brackets').bracket({
+                    init: minimalData{#,
+                    decorator: {
+                        edit: edit_fn,
+                        render: render_fn
+                    }#}
+                });
+                setTimeout(function(){
+                    $('.teamContainer').each(function(){
+                        var $team1 = $(this).find('.team').first();
+                        var $team2 = $(this).find('.team').last();
+                        var dataT1 = $team1.data('teamid');
+                        var dataT2 = $team2.data('teamid');
+                        var p1 = $team1.find('.label').text();
+                        var p2 = $team2.find('.label').text();
+                        var res1 = $team1.find('.score').text();
+                        var res2 = $team2.find('.score').text();
+                                                
+                        var matchID = matchIDs[p1+'|'+p2];
+                        if (typeof matchID !== 'undefined'){
+                            $(this).append('<div class="link"><a href="/partido/'+matchID+'.html"><i class="fa fa-eye fa-spacer-right"></i>VER INFO</a></div>');
+                        }
+                        
+                        if ((res1 === '-1' && res2 === '-2') || (res1 === '-2' && res2 === '-1')){
+                            $team1
+                                    .removeClass('win')
+                                    .removeClass('lose');
+                            $team2
+                                    .removeClass('win')
+                                    .removeClass('lose');
+                            $team1.find('.score').text('--');
+                            $team2.find('.score').text('--');
+                            
+                            var round = $team1.parents('.round');
+                            
+                            while (round.next().length > 0){
+                                var actualRound = roundT1.next();
+                                var novalids = actualRound.find('[data-teamid="'+dataT1+'"],[data-teamid="'+dataT2+'"]');
+                                novalids
+                                        .removeClass('win')
+                                        .removeClass('lose')
+                                        .addClass('na')
+                                        .addClass('highlightWinner')
+                                        .addClass('highlightLoser')
+                                        .attr('data-teamid', -1);
+                                novalids.find('.score').text('--');
+                                novalids.find('.label').text('--');
+                            }
+                        }
+                            
+                        $('#brackets').parents('.brackets-container').find('.brackets-loader').addClass('hidden');
+                    });
+                }, 500);
+            });
+        });
+    </script>    
+    {% endif %}
+{% endblock page_scripts %}

@@ -1,0 +1,41 @@
+{% extends constant('THEME_NAME')~'/user/base_profile.twig' %}
+
+{% block info %}
+    <form class="form-inline" role="form" method="post">
+        <input type="text" name="username" placeholder="Usuario" class="form-control"/>
+        <select name="game" class="form-control">
+        {% for game in games %}
+            <option value="{{ game.id }}">{{ game.name }}</option>
+        {% endfor %}
+        </select>
+        <button class="btn btn-success" type="submit" name="flag" value="add"><i class="fa fa-check"></i></button>
+    </form>
+    <br/>
+    {% if accounts|length > 0 %}
+    <table class="table table-hover table-condensed">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Juego</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for account in accounts %}
+            <tr>
+                <td>{{ account.username }}</td>
+                <td>{{ account.game_name }}</td>
+                <td>
+                    <form method="post" role="form">
+                        <input type="hidden" name="account" value="{{ account.id }}"/>
+                        <button type="submit" name="flag" value="remove" class="btn btn-danger btn-sm"><i class="fa fa-times"></i></button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info">No tienes cuentas vinculadas</div>
+    {% endif %}
+{% endblock info %}

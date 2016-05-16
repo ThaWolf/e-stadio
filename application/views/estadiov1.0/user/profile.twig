@@ -1,0 +1,190 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+<div class="row">    
+    <div class="col-sm-3">
+        <div class="thumb-container">
+            <img class="thumbnail" src="{{ get_image(user.image) }}">
+            <div class="thumb-description">
+                <h5 class="text-center thumb-title">{{ user.username|upper }}</h5>
+            </div>
+            {% if user.iam %}            
+            {{ get_image_form('/ajax_user_update_image',user.image)|raw }}
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="page-title">
+            {% if user.iam %}
+                {% if this.input.get('modo') == 'edicion' %}
+                <a href="?" class="pull-right lh-h1">VER NORMAL</a>
+                {% else %}
+                <a href="?modo=edicion" class="pull-right lh-h1">EDITAR</a>
+                {% endif %}
+            {% elseif get_user() %}
+                <a href="#" class="report pull-right lh-h1" data-reason="user" data-params="{{ user.id }}">REPORTAR</a>
+            {% endif %}
+            <h1>{{ user.username|upper }}</h1>
+        </div>
+        <div class="box {% if not user.iam or this.input.get('modo') != 'edicion' %} {% endif %}vert-spacer">
+            <h4>DATOS {% if not user.iam or this.input.get('modo') != 'edicion' %}<a href="#" class="box-collapse-btn pull-right lh-h4"><i class="fa fa-angle-double-down off"></i><i class="fa fa-angle-double-up on"></i></a>{% endif %}</h4>
+            <div class="box-inner">                
+                {% if user.iam and this.input.get('modo') == 'edicion' %}
+                <form method="post"  class="ajax-form password" action="/ajax_update_profile">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <input type="text" value="{{ user.first_name }}" name="first_name" placeholder="Nombre" class="form-control"/>
+                            <input type="text" value="{{ user.last_name }}" name="last_name" placeholder="Apellido" class="form-control input-spacer-top"/>
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" value="{{ user.dni }}" name="dni" placeholder="DNI" class="form-control"/>
+                            <input type="text" value="{{ user.url }}" name="url" placeholder="Página Web" class="form-control input-spacer-top"/>
+                        </div>                        
+                        <div class="col-sm-offset-6 col-sm-6">
+                            <button type="submit" class="btn btn-custom btn-block input-spacer-top" ><i class="fa fa-save fa-spacer-right"></i>Guardar</button>
+                        </div>
+                    </div>
+                </form>
+                {% else %}
+                <table class="table-data">
+                    <tr>
+                        <td class="bold">Usuario:</td>
+                        <td>{{ user.username|upper }}</td>
+                    </tr>                
+                    <tr>
+                        <td class="bold">Miembro desde: </td>
+                        <td>{{ user.created_at|date('d/m/Y H:i') }}hs</td>
+                    </tr>               
+                    <tr>
+                        <td class="bold">Última vez conectado: </td>
+                        <td>{% if user.last_login is not null %}{{ user.last_login|date('d/m/Y H:i') }}hs{% else %}Nunca{% endif %}</td>
+                    </tr>
+                    {% if user.iam or is_admin() %}                        
+                    <tr>
+                        <td class="bold">Nombre:</td>
+                        <td>{{ user.first_name }}</td>
+                    </tr>                     
+                    <tr>
+                        <td class="bold">Apellido:</td>
+                        <td>{{ user.last_name }}</td>
+                    </tr>                  
+                    <tr>
+                        <td class="bold">DNI:</td>
+                        <td>{{ user.dni }}</td>
+                    </tr>                 
+                    <tr>
+                        <td class="bold">Página Web:</td>
+                        <td>{{ user.url }}</td>
+                    </tr> 
+                    {% endif %}
+                </table>                     
+                {% endif %}
+            </div>
+        </div>   
+        <div class="box vert-spacer">
+            <h4>CUENTAS ASOCIADAS <a href="#" class="box-collapse-btn pull-right lh-h4"><i class="fa fa-angle-double-down off"></i><i class="fa fa-angle-double-up on"></i></a></h4>
+            <div class="box-inner">
+                {% if user.iam %}
+                    <form class="ajax-form password form-inline bottom-spacer" method="post" action="/ajax_add_account">
+                        <input type="text" name="username" class="form-control" placeholder="Username"/>
+                        <select name="game" class="form-control">
+                        {% for game in games %}
+                            <option value="{{ game.id }}">{{ game.name }}</option>
+                        {% endfor %}
+                        </select>
+                        <button class="btn btn-custom" type="submit"><i class="fa fa-plus"></i></button>
+                    </form>
+                {% endif %}
+                <table class="table table-bordered table-condensed table-hover table-responsive">
+                    <tbody>
+                    {% for account in user.accounts %}                        
+                        <tr>
+                            <td>{{ account.username }}<span class="pull-right">{{ account.game_name }}</span></td>
+                            {% if user.iam %}
+                            <td class="danger">
+                                <form class="ajax-form password" method="post" action="/ajax_remove_account/{{ account.id }}">
+                                    <button class="btn btn-unstyled btn-block text-danger" type="submit"><i class="fa fa-times"></i></button>
+                                </form>    
+                            </td>
+                            {% endif %}
+                        </tr>
+                    {% else %}
+                        <tr class="info">
+                            <td>Ninguna</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="box vert-spacer">
+            <h4>EQUIPOS <a href="#" class="box-collapse-btn pull-right lh-h4"><i class="fa fa-angle-double-down off"></i><i class="fa fa-angle-double-up on"></i></a></h4>
+            <div class="box-inner">
+                {% if user.iam %}
+                    <form class="ajax-form password form-inline bottom-spacer" method="post" action="/ajax_create_team">
+                        <input type="text" name="team_name" class="form-control" placeholder="Nombre de Equipo"/>
+                        <select name="game" class="form-control">
+                        {% for game in games_children %}
+                            <option value="{{ game.id }}">{{ game.name }}</option>
+                        {% endfor %}
+                        </select>
+                        <button class="btn btn-custom" type="submit"><i class="fa fa-plus"></i></button>
+                    </form>
+                {% endif %}
+                <table class="table table-bordered table-condensed table-hover table-responsive table-striped">
+                    <tbody>
+                    {% for team in user.teams %}                        
+                        <tr>
+                            <td><a href="/equipo/{{ team.id }}/{{ text_normalize(team.name) }}.html">{{ team.name }}<span class="pull-right">{{ team.game_name }}</span></a></td>
+                        </tr>
+                    {% else %}
+                        <tr class="info">
+                            <td>Ninguno</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div> 
+    <div class="col-sm-3">
+        {% if user.iam %}
+        <div class="box">
+            <h4>INVITACIONES</h4>
+            <div class="box-inner">
+                {% for request in user.requests %}
+                <div>
+                    <h2><a href="/equipo/{{ request.team_id }}/{{ text_normalize(request.team_name) }}.html">{{ request.team_name }}</a></h2>
+                    <form method="post" action="/ajax_accept_team_invitation" class="ajax-form password pull-right">
+                        <input type="hidden" name="team_request" value="{{ request.id }}"/>
+                        <button type="submit" class="btn btn-success"><i class="fa fa-check"></i></button>
+                    </form>
+                    <form method="post" action="/ajax_decline_team_invitation" class="ajax-form password">
+                        <input type="hidden" name="team_request" value="{{ request.id }}"/>
+                        <button type="submit" class="btn btn-danger"><i class="fa fa-close"></i></button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="alert alert-info">No hay</div>
+                {% endfor %}
+            </div>
+        </div>
+        {% elseif get_user() %}
+        <div class="box">
+            <h4>DÉJALE UN MENSAJE</h4>
+            <div class="box-inner">
+                <form method="post" action="/ajax_send_message" class="ajax-form confirm">
+                    <input type="text" name="subject" class="form-control" placeholder="Asunto"/>
+                    <textarea class="form-control input-spacer-top" name="message" placeholder="Mensaje"></textarea>
+                    <button type="submit" class="btn btn-custom btn-block input-spacer-top">Enviar</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div> 
+</div>
+{% endblock content_page %}

@@ -1,0 +1,36 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+        <h1 class="text-center">Nosotros</h1>
+        <section id="faqs-top">
+
+            <div class="divider-w"><div class="divider row">
+                <div>
+                    <img src="/images/2.0/divider.png">
+                </div>
+            </div></div>  
+            <div class="row">
+                <div class="col-sm-12">
+
+                </div>
+            </div>  
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3>Charizard Lorem ipsum dolor sit amet, consectetur adipiscing elit. </h3>
+                    <p>Bulbasaur Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ivysaur Lorem ipsum dolor sit amet, consectetur adipiscing elit. Venusaur Lorem ipsum dolor sit amet, consectetur adipiscing elit. Charmander Lorem ipsum dolor sit amet, consectetur adipiscing elit. Charmeleon Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+                <div class="col-sm-6">
+                    <h3>Squirtle Lorem ipsum dolor sit amet, consectetur adipiscing elit. </h3>
+                    <p>Wartortle Lorem ipsum dolor sit amet, consectetur adipiscing elit. Blastoise Lorem ipsum dolor sit amet, consectetur adipiscing elit. Caterpie Lorem ipsum dolor sit amet, consectetur adipiscing elit. Metapod Lorem ipsum dolor sit amet, consectetur adipiscing elit. Butterfree Lorem ipsum dolor sit amet, consectetur adipiscing elit. </p>                    
+                </div>                
+            </div>
+        </section>
+        <br><br>
+        <br><br>
+        <div class="divider row">
+        </div>
+{% endblock content_page %}

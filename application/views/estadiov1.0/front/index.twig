@@ -1,0 +1,196 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+
+
+    <div class="row incoming-tournaments">
+
+        {% for tournament in active_tournaments %}  
+        
+        <div class="col-sm-12 tournament-w {% if active_tournaments|first == tournament %}active{% else %}hidden{% endif %}">
+       <!--     <div id="demo-slider" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <li data-target="#demo-slider" data-slide-to="0" class="active"></li>
+                </ol>
+
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active">
+                        <img src="images/slider-image.jpg" alt="Pitusas Image">
+                        <div class="carousel-caption">
+                        </div>
+                    </div>
+                </div>
+
+                <a class="left carousel-control" href="#demo-slider" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="right carousel-control" href="#demo-slider" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>-->
+            <div class="col-sm-8 tournament-item">
+                <div class="titem-img">
+                    <img src="images/kundun.png">
+                </div>
+            </div>
+            <div class="col-sm-4 tournament-info">
+                <div class="tinf-header">
+                    <a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html"><h3><img src="images/2.0/torneo_play.png">{{ tournament.name }}</h3></a>
+                </div>
+                <div class="tinf-game">
+                    <h4>JUEGO</h4>
+                    <p>{{ tournament.game_name }}</p>
+                    <h4>TIPO DE TORNEO</h4>
+                    <p>{% if tournament.team_require == '1' %}Torneo por Equipos{% else %}Torneo Individual{% endif %}</p>                
+                </div>
+                <div class="tinf-details">
+                    <h4>FECHA DE APERTURA</h4>
+                    <p>{{tournament.start_at|date("d/m/Y")}}</p>
+
+                </div>
+                
+                  <span><a target="_blank" href="http://www.facebook.com/sharer/sharer.php?u=/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html&title={{tournament.name}}"><img src="/images/2.0/redsocial_facebook.png"></a></span>
+                  <span><a href=""><img src="/images/2.0/redsocial_twitter.png"></a></span>
+                  <span><a href=""><img src="/images/2.0/redsocial_google.png"></a></span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+                <div class="divider-w"><div class="divider row">
+                <div>
+                    <img src="/images/2.0/divider.png">
+                </div>
+            </div></div>
+
+            <section id="brands">
+                <h1 class="text-center">Nos acompañan</h1>
+                <h2 class="text-center">Lorem Ipsum</h2>
+                <div class="col-sm-12">
+                	<div class="col-sm-2 brand-list">
+                		<ul>
+                            {% for sponsor in sponsors %}
+                			     <li><a href="http://{{ sponsor.url }}" target="_black" title="Ir al sitio de {{ sponsor.name }}">{{ sponsor.name }}</a></li>
+                            {% endfor %}
+                		</ul>
+                	</div>                	
+                	<div class="col-sm-10 brand-thumbs">
+                        {% for sponsor in sponsors %}                    
+                    		<div class="col-sm-2">
+                    			<div class="brand-thumb">
+                    				<a href="http://{{ sponsor.url }}" title="Ir al sitio de {{ sponsor.name }}"><img src="images/sponsor/{{ sponsor.image }}"></a>
+                    			</div>
+                    		</div>
+                        {% endfor %}                            
+                	</div>
+                </div>
+            </section>
+
+            <div class="divider-w"><div class="divider row">
+                <div>
+                    <img src="/images/2.0/divider.png">
+                </div>
+            </div></div>
+
+            <section id="last-winners">
+                <h1 class="text-center">Ultimos ganadores</h1>
+                
+                <div class="row winners">
+                    {% for winner in winners %}
+                        <div class="col-sm-3 winner">
+                            <div class="winner-header">
+                                <div class="image">
+                                    <img src="uploads/{{winner.image}}">
+                                </div>
+                                <div class="winner-heading">
+                                    <h5 class="tname"><a href="/torneo/{{ winner.tournament_id }}/{{ winner.name|replace({' ': '-'}) }}.html" title="Torneo {{ winner.name }}">{{ winner.name }}</a></h5>
+                                    <h5>Puesto 1°</h5>
+                                    <div class="first-winner">
+                                        <div class="img">
+                                        <img src="uploads/{{winner.user_image}}">
+                                        <h5 class="text-center"><a href="/perfil/{{ winner.first_place.username }}.html" title="Perfil de {{ winner.first_place.username }}">{{ winner.first_place.username }}</a></h5>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="last-positions">
+                                <h5 class="text-center"><a href="/perfil/{{ winner.second_place.username }}.html" title="Perfil de {{ winner.second_place.username }}">Puesto 2°: {{ winner.second_place.username }}</a></h5>
+                                <h5 class="text-center"><a href="/perfil/{{ winner.third_place.username }}.html" title="Perfil de {{ winner.third_place.username }}">Puesto 3°: {{ winner.third_place.username }}</a></h5>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <div class="divider-w"><div class="divider row">
+                <div>
+                    <img src="/images/2.0/divider.png">
+                </div>
+            </div></div>
+
+            <section id="active-tournaments">
+                <h1 class="text-center">Torneos activos</h1>
+			    <div class="row">
+                {% for tournament in active_tournaments %}
+                    <div class="col-sm-6 col-sm-offset-3">
+                        
+                            <div class="active-tournament-w">
+                                <a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html"><img src="images/kundun.png"><div>{{ tournament.name|upper }}<img src="images/2.0/mas_fondo.png" class="atvplus"></a></div>
+                            </div>
+                    </div>
+                        {% endfor %}                        
+
+			   <!--     <div class="col-sm-6 vert-spacer">
+			            <div class="box">
+			                <h4>TORNEOS VIGENTES</h4>
+			                <div class="box-inner">
+			                    <ul class="unstyled">
+			                        {% for tournament in active_tournaments %}
+			                            <li><a class="tournament-link" href="/torneo/{{ tournament.id }}/{{ text_normalize(tournament.name) }}.html">{{ tournament.name|upper }} - {{ tournament.game_name|upper }}</a></li>
+			                        {% endfor %}
+			                    </ul>
+			                </div>
+			            </div>
+			        </div>-->
+			        <!--<div class="col-sm-6 vert-spacer">
+			            <div class="box">
+			                <h4>PRÓXIMOS TORNEOS</h4>
+			                <div class="box-inner">
+			                    <ul class="unstyled">
+			                        {% for tournament in coming_tournaments %}
+			                            <li><a class="tournament-link" href="/torneo/{{ tournament.id }}/{{ text_normalize(tournament.name) }}.html">{{ tournament.name|upper }} - {{ tournament.game_name|upper }}</a></li>
+			                        {% endfor %}
+			                    </ul>
+			                </div>
+			            </div>
+			        </div>-->
+			    </div>
+            </section>
+            <div class="divider-w">
+                <div class="divider row">
+                </div>
+            </div>               
+
+            <section id="contact">
+                <h1 class="text-center">Contacto</h1>
+                <h2 class="text-center">Lorem Ipsum</h2>
+                <div class="col-sm-8 col-sm-offset-2">
+                	<form method="POST" action="contact">
+                		<input type="text" name="name" placeholder="Nombre">
+                		<input type="text" name="email" placeholder="Email">
+                		<input type="text" name="msg" placeholder="Mensaje">
+                        <input type="submit" name="contacto" placeholder="Enviar" class="submit-contact">
+                	</form>
+                </div>
+            </section>
+            <div class="divider row">
+            </div>
+{% endblock content_page %}

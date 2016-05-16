@@ -1,0 +1,21 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+
+{% block content %}
+    <a class="btn btn-success" href="/admin/crear_torneo">Crear Torneo</a><br><br>
+    <table class="table table-hover table-bordered table-striped">
+        <tr>
+            <th>Nombre</th>
+            <th>Empieza</th>
+            <th>Finalizó</th>
+            <th></th>
+        </tr>
+    {% for tournament in tournaments %}
+        <tr>
+            <td>{{ tournament.title }}</td>
+            <td>{{ tournament.start_at|date('d/m/Y H:i') }}</td>
+            <td>{% if tournament.ends_at is not null %}{{ tournament.ends_at|date('d/m/Y H:i') }}{% else %}No terminó{% endif %}</td>
+            <td><a href="/admin/borrar_torneo/{{ tournament.id }}">Borrar</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock content %}

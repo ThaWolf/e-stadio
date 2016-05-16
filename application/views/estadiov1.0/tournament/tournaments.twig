@@ -1,0 +1,49 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+
+            <section id="active-tournaments">
+                <h1 class="text-center">Torneos activos</h1>
+			    <div class="row">
+                {% for tournament in active_tournaments %}
+                    <div class="col-sm-6 col-sm-offset-3">
+                        
+                            <div class="active-tournament-w">
+                                <a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html"><img src="images/kundun.png"><div>{{ tournament.name|upper }}<img src="images/2.0/mas_fondo.png" class="atvplus"></a></div>
+                            </div>
+                    </div>
+                        {% endfor %}                        
+
+			   <!--     <div class="col-sm-6 vert-spacer">
+			            <div class="box">
+			                <h4>TORNEOS VIGENTES</h4>
+			                <div class="box-inner">
+			                    <ul class="unstyled">
+			                        {% for tournament in active_tournaments %}
+			                            <li><a class="tournament-link" href="/torneo/{{ tournament.id }}/{{ text_normalize(tournament.name) }}.html">{{ tournament.name|upper }} - {{ tournament.game_name|upper }}</a></li>
+			                        {% endfor %}
+			                    </ul>
+			                </div>
+			            </div>
+			        </div>-->
+			        <!--<div class="col-sm-6 vert-spacer">
+			            <div class="box">
+			                <h4>PRÓXIMOS TORNEOS</h4>
+			                <div class="box-inner">
+			                    <ul class="unstyled">
+			                        {% for tournament in coming_tournaments %}
+			                            <li><a class="tournament-link" href="/torneo/{{ tournament.id }}/{{ text_normalize(tournament.name) }}.html">{{ tournament.name|upper }} - {{ tournament.game_name|upper }}</a></li>
+			                        {% endfor %}
+			                    </ul>
+			                </div>
+			            </div>
+			        </div>-->
+			    </div>
+            </section>
+
+
+{% endblock content_page %}

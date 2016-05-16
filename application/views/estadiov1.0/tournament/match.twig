@@ -1,0 +1,395 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+    <div class="row">
+        <div class="col-sm-3">
+            <a href="/perfil/{{ text_normalize(match.player1.username) }}.html">
+            <div class="thumb-container">
+                <img class="thumbnail" src="{{ get_image(match.player1.image) }}">
+                <div class="thumb-description">
+                    <h5 class="text-center thumb-title">{{ match.player1.username|upper }}</h5>
+                </div>
+            </div>
+            </a>
+        </div>
+        <div class="col-sm-6">
+            <div class="page-title">
+                <h1 class="text-center"><a href="/torneo/{{ tournament.id }}/{{ text_normalize(tournament.name) }}.html">{{ tournament.name|upper }}</a></h1>
+                <hr/>
+                <h2 class="lh-h1 text-center"><span class="pull-left">{{ match.player1.game_account.username|upper }}</span><span class="pull-right">{{ match.player2.game_account.username|upper }}</span></h2>
+            </div>
+            {% if match.problem is not null  %}
+                <div class="alert alert-danger vert-spacer">Ha ocurrido un problema con los jugadores de este partido, nuestros administradores están haciendo lo posible para que esto se solucione</div>
+                {% if is_admin() %}
+                <div class="box vert-spacer">
+                    <h4>Reporta los encuentros<button class="hidden pull-right btn btn-custom btn-xs" id="reset"><i class="fa fa-refresh fa-spacer-right"></i>Reset</button></h4>
+                    <div class="box-inner">
+                        <form id="report"  method="post" action="/ajax_send_match_result/{{ match.id }}" class="ajax-form confirm bestof{{ match.best_of }}">
+                        <table class="table table-bordered table-condensed table-hover">
+                            <tbody>
+                            {% for encounter in range(1, match.best_of) %}                                
+                                <tr class="text-center encounter{% if encounter > match.max %} hidden unnecessary{% endif %}" data-encounter="{{ encounter }}" data-selected="">
+                                    <td>
+                                        <div class="custom-radio" data-group="{{ encounter }}">
+                                            <i class="fa fa-square-o off"></i>
+                                            <i class="fa fa-check-square-o on"></i>
+                                            <input type="radio" name="sub_matches[{{ encounter }}]" value="1"/>
+                                        </div>
+                                    </td>
+                                    <th class="info text-info text-center">{{ encounter }}°</th>
+                                    <td>                                    
+                                        <div class="custom-radio" data-group="{{ encounter }}">
+                                            <i class="fa fa-square-o off"></i>
+                                            <i class="fa fa-check-square-o on"></i>
+                                            <input type="radio" name="sub_matches[{{ encounter }}]" value="2"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                            <button type="submit" class="btn btn-custom pull-right hidden vert-spacer"><i class="fa fa-send fa-spacer-right"></i>Enviar Reporte</button>
+                        </form>
+                    </div>
+                </div>    
+                <div class="box vert-spacer">
+                    <h4 class="text-center">Reporte de {{ match.player1.username|upper }}</h4>
+                    <div class="box-inner">
+                        <table class="table table-bordered table-condensed table-hover table-striped">
+                            <tbody>
+                            {% for index, winner in obj2array(match.data.player1.sub_matches) %}
+                                <tr class="text-center">
+                                    <td class="col-xs-4 text-center {% if winner == 1 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 1 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                                    <th class="col-xs-4 text-center info text-info">{{ index }}°</th>
+                                    <td class="col-xs-4 text-center {% if winner == 2 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 2 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                                </tr>
+                            {% else %}
+                                <tr class="text-center">
+                                    <td class="danger text-danger">{{ match.player1.username|upper }} no reportó sus encuentros</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="box vert-spacer">
+                    <h4 class="text-center">Reporte de {{ match.player2.username|upper }}</h4>
+                    <div class="box-inner">
+                        <table class="table table-bordered table-condensed table-hover table-striped">
+                            <tbody>
+                            {% for index, winner in obj2array(match.data.player2.sub_matches) %}
+                                <tr class="text-center">
+                                    <td class="col-xs-4 text-center {% if winner == 1 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 1 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                                    <th class="col-xs-4 text-center info text-info">{{ index }}°</th>
+                                    <td class="col-xs-4 text-center {% if winner == 2 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 2 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                                </tr>
+                            {% else %}
+                                <tr class="text-center">
+                                    <td class="danger text-danger">{{ match.player2.username|upper }} no reportó sus encuentros</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            {% elseif match.winner is not null %}
+            <div class="box vert-spacer">
+                <h4 class="text-center">Encuentros</h4>
+                <div class="box-inner">
+                    <table class="table table-bordered table-condensed table-hover table-striped">
+                        <tbody>                           
+                        {% for index, winner in obj2array(match.data.sub_matches) %}
+                            <tr class="text-center">
+                                <td class="col-xs-4 text-center {% if winner == 1 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 1 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                                <th class="col-xs-4 text-center info text-info">{{ index }}°</th>
+                                <td class="col-xs-4 text-center {% if winner == 2 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 2 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% elseif not match.player %}
+                <div class="alert alert-info vert-spacer">Los jugadores están <strong>reportando</strong> sus partidas</div>
+            {% elseif match.remaining %}
+            <div class="box vert-spacer">
+                <h4>Reporta los encuentros<button class="hidden pull-right btn btn-custom btn-xs" id="reset"><i class="fa fa-refresh fa-spacer-right"></i>Reset</button></h4>
+                <div class="box-inner">
+                    <form id="report"  method="post" action="/ajax_send_match_result/{{ match.id }}" class="ajax-form confirm bestof{{ match.best_of }}">
+                    <table class="table table-bordered table-condensed table-hover">
+                        <tbody>
+                        {% for encounter in range(1, match.best_of) %}                                
+                            <tr class="text-center encounter{% if encounter > match.max %} hidden unnecessary{% endif %}" data-encounter="{{ encounter }}" data-selected="">
+                                <td>
+                                    <div class="custom-radio" data-group="{{ encounter }}">
+                                        <i class="fa fa-square-o off"></i>
+                                        <i class="fa fa-check-square-o on"></i>
+                                        <input type="radio" name="sub_matches[{{ encounter }}]" value="1"/>
+                                    </div>
+                                </td>
+                                <th class="info text-info text-center">{{ encounter }}°</th>
+                                <td>                                    
+                                    <div class="custom-radio" data-group="{{ encounter }}">
+                                        <i class="fa fa-square-o off"></i>
+                                        <i class="fa fa-check-square-o on"></i>
+                                        <input type="radio" name="sub_matches[{{ encounter }}]" value="2"/>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                        <button type="submit" class="btn btn-custom pull-right hidden vert-spacer"><i class="fa fa-send fa-spacer-right"></i>Enviar Reporte</button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="box vert-spacer">
+                <h4 class="text-center">Tu reporte</h4>
+                <div class="box-inner">
+                    <table class="table table-bordered table-condensed table-hover table-striped">
+                        <tbody>
+                        {% if match.player == 1 %}
+                        {% for index, winner in obj2array(match.data.player1.sub_matches) %}
+                            <tr class="text-center">
+                                <td class="col-xs-4 text-center {% if winner == 1 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 1 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                                <th class="col-xs-4 text-center info text-info">{{ index }}°</th>
+                                <td class="col-xs-4 text-center {% if winner == 2 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 2 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                        {% elseif match.player == 2 %}
+                        {% for index, winner in obj2array(match.data.player2.sub_matches) %}
+                            <tr class="text-center">
+                                <td class="col-xs-4 text-center {% if winner == 1 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 1 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                                <th class="col-xs-4 text-center info text-info">{{ index }}°</th>
+                                <td class="col-xs-4 text-center {% if winner == 2 %}success text-success{% else %}danger text-danger{% endif %}">{% if winner == 2 %}<i class="fa fa-check"></i>{% else %}<i class="fa fa-times"></i>{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-sm-3">
+            <a href="/perfil/{{ text_normalize(match.player2.username) }}.html">
+            <div class="thumb-container">
+                <img class="thumbnail" src="{{ get_image(match.player2.image) }}">
+                <div class="thumb-description">
+                    <h5 class="text-center thumb-title">{{ match.player2.username|upper }}</h5>
+                </div>
+            </div>
+            </a>
+        </div>
+    </div>
+{% endblock content_page %}
+
+{% block page_scripts %}
+    {{ parent() }}
+    <script>
+        function unexpendables(encounters, indexes){
+            for (var i = 0; i < indexes.length; i++){
+                if (typeof encounters[indexes[i]] === 'undefined'){
+                    return false;
+                }
+            }
+            return true;
+        }
+        function calc_wins(encounters){
+            var p1_wins = 0;
+            var p2_wins = 0;
+            
+            for (var i = 1; i <= encounters.length; i++){
+                if (encounters[i] == '1'){
+                    p1_wins++;
+                }
+                else if (encounters[i] == '2'){
+                    p2_wins++;
+                }
+            }
+            
+            return new Array(p1_wins, p2_wins);
+        }
+        function someone_wins(wins, compare){
+            return wins[0] === compare || wins[1] === compare;
+        }
+        $(document).ready(function(){
+            $('#reset').click(function(){
+                $(this).addClass('hidden');
+                $('#report .unnecessary').addClass('hidden');
+                $('#report td').removeClass('success').removeClass('danger');
+                $('#report .custom-radio input').prop('checked', false);
+                $('#report [type="submit"]').addClass('hidden');
+                $('#report .custom-radio').removeClass('on').removeClass('disabled');
+            });
+            $('.bestof1 .custom-radio').click(function(){
+                var $this = $(this);
+                
+                if ($this.hasClass('disabled')){
+                    return;
+                }
+                
+                var $tr = $this.parents('tr');
+                var $td = $this.parents('td');
+                var $btn = $this.parents('form').find('[type="submit"]');
+                
+                $('#reset').removeClass('hidden');
+                $tr.find('.custom-radio').addClass('disabled');
+                $td.addClass('success');
+                $td.siblings('td').addClass('danger');
+                
+                
+                $btn.removeClass('hidden');    
+            });
+            $('.bestof3 .custom-radio').click(function(){
+                var $this = $(this);
+                
+                if ($this.hasClass('disabled')){
+                    return;
+                }
+                
+                var $tr = $this.parents('tr');
+                var $td = $this.parents('td');
+                var $encounters = $this.parents('form').find('.encounter');
+                var encounters = new Array();
+                var $btn = $this.parents('form').find('[type="submit"]');
+                $('#reset').removeClass('hidden');
+                $tr.find('.custom-radio').addClass('disabled');
+                $td.addClass('success');
+                $td.siblings('td').addClass('danger');
+                
+                $encounters.each(function(){
+                    var $encounter = $(this);
+                    encounters[$encounter.data('encounter')] = $encounter.find('input:checked').val();
+                });
+                
+                var wins = calc_wins(encounters);
+                
+                var diff = Math.abs(wins[0] - wins[1]);
+                var total = wins[0] + wins[1];
+                
+                if (total === 2){
+                    if (diff === 0){                        
+                        $encounters.filter('[data-encounter="3"]').removeClass('hidden');
+                    }
+                    else{
+                        $btn.removeClass('hidden');
+                    }
+                }
+                else if (total === 3){
+                    $btn.removeClass('hidden');                
+                }
+            });
+            $('.bestof5 .custom-radio').click(function(){
+                var $this = $(this);
+                
+                if ($this.hasClass('disabled')){
+                    return;
+                }
+                
+                var $tr = $this.parents('tr');
+                var $td = $this.parents('td');
+                var $encounters = $this.parents('form').find('.encounter');
+                var encounters = new Array();
+                var $btn = $this.parents('form').find('[type="submit"]');
+                
+                $('#reset').removeClass('hidden');
+                $tr.find('.custom-radio').addClass('disabled');
+                $td.addClass('success');
+                $td.siblings('td').addClass('danger');
+                
+                $encounters.each(function(){
+                    var $encounter = $(this);
+                    encounters[$encounter.data('encounter')] = $encounter.find('input:checked').val();
+                });
+                
+                var wins = calc_wins(encounters);
+                
+                var diff = Math.abs(wins[0] - wins[1]);
+                var total = wins[0] + wins[1];
+                
+                if (total === 3){
+                    if (diff === 1){                        
+                        $encounters.filter('[data-encounter="4"]').removeClass('hidden');
+                    }
+                    else{
+                        $btn.removeClass('hidden');
+                    }
+                }
+                else if (total === 4){
+                    if (diff === 0){                      
+                        $encounters.filter('[data-encounter="5"]').removeClass('hidden');
+                    }
+                    else{
+                        $btn.removeClass('hidden');
+                    }
+                }
+                else if (total === 5){
+                    $btn.removeClass('hidden');
+                }
+            });
+            $('.bestof7 .custom-radio').click(function(){
+                var $this = $(this);
+                
+                if ($this.hasClass('disabled')){
+                    return;
+                }
+                
+                var $tr = $this.parents('tr');
+                var $td = $this.parents('td');
+                var $encounters = $this.parents('form').find('.encounter');
+                var encounters = new Array();
+                var $btn = $this.parents('form').find('[type="submit"]');
+                
+                $('#reset').removeClass('hidden');
+                $tr.find('.custom-radio').addClass('disabled');
+                $td.addClass('success');
+                $td.siblings('td').addClass('danger');
+                
+                $encounters.each(function(){
+                    var $encounter = $(this);
+                    encounters[$encounter.data('encounter')] = $encounter.find('input:checked').val();
+                });
+                
+                var wins = calc_wins(encounters);
+                
+                var diff = Math.abs(wins[0] - wins[1]);
+                var total = wins[0] + wins[1];
+                
+                if (total === 4){
+                    if (diff < 4){                        
+                        $encounters.filter('[data-encounter="5"]').removeClass('hidden');
+                    }
+                    else{
+                        $btn.removeClass('hidden');
+                    }
+                }
+                else if (total === 5){
+                    if (diff === 1){                      
+                        $encounters.filter('[data-encounter="6"]').removeClass('hidden');
+                    }
+                    else{
+                        $btn.removeClass('hidden');
+                    }
+                }
+                else if (total === 6){                   
+                    if (diff === 0){                      
+                        $encounters.filter('[data-encounter="7"]').removeClass('hidden');
+                    }
+                    else{
+                        $btn.removeClass('hidden');
+                    }
+                }
+                else if (total === 7){
+                    $btn.removeClass('hidden');
+                } 
+            });
+        });
+    </script>
+{% endblock page_scripts %}

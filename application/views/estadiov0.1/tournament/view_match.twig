@@ -1,0 +1,92 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+            {% if match.closed_at is null %}
+                {% if (is_player1 and (match.data.player1.player1_result is defined) and (match.data.player1.player2_result is defined))
+                   or (is_player2 and (match.data.player2.player1_result is defined) and (match.data.player2.player2_result is defined)) %}
+
+                <div class="custom_result">
+                    Tu resultado fué<br>
+                    {% if is_player1 %}
+                        {{ match.data.player1.player1_result }} - {{ match.data.player1.player2_result }}
+                    {% else %}
+                        {{ match.data.player2.player1_result }} - {{ match.data.player2.player2_result }}
+                    {% endif %}
+                </div>
+            {% elseif is_player1 or is_player2 %}
+                <form method="POST" class="form-inline">
+                    <input type="text" name="player1_result" class="form-control input-sm" placeholder="Resultado Jugador 1"/>
+                    -
+                    <input type="text" name="player2_result" class="form-control input-sm" placeholder="Resultado Jugador 2"/>
+                    <button type="submit" name="flag" value="set_result" class="btn btn-sm btn-success"><i class="fa fa-check"></i></button>
+                </form>                    
+                <br/>
+                {% if form_error('player1_result') != '' %}
+                    <div class="alert alert-danger">{{ form_error('player1_result', '', '')|raw }}</div>
+                {% endif %}
+                {% if form_error('player2_result') != '' %}
+                    <div class="alert alert-danger">{{ form_error('player2_result', '', '')|raw }}</div>
+                {% endif %}
+            {% endif %}
+            {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <h2>{{ match.player1.username }}</h2>
+                <img class="thumbnail" src="{{ (match.player1.image == '')?'/img/user_default_image.png':match.player1.image }}"/>
+                <div class="result">
+                    {% if match.data.player1_result is defined %}
+                        {{ match.data.player1_result }}
+                    {% else %}
+                        ???
+                    {% endif %} 
+                </div>
+                {% if match.data.player1.reports is defined %}
+                    <div class="reports">
+                        {% for report in match.data.player1.reports %}
+                            <div class="report">
+                                <h4>{{ report.date|date('d/m/Y H:i') }}</h4>
+                                <div class="message">{{ report.message|raw }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-sm-6">                
+                <h2>{{ match.player2.username }}</h2>
+                <img class="thumbnail" src="{{ (match.player2.image == '')?'/img/user_default_image.png':match.player2.image }}"/>
+                <div class="result">
+                    {% if match.data.player2_result is defined %}
+                        {{ match.data.player2_result }}
+                    {% else %}
+                        ???
+                    {% endif %}
+                </div>
+                {% if match.data.player2.reports is defined %}
+                    <div class="reports">
+                        {% for report in match.data.player2.reports %}
+                            <div class="report">
+                                <h4>{{ report.date|date('d/m/Y H:i') }}</h4>
+                                <div class="message">{{ report.message|raw }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">            
+                {% if match.closed_at is null and (is_player1 or is_player2) %}
+                    <h3>Nuevo Reporte</h3>
+                    <form method="post">
+                        <textarea class="summernote" name="report">{{ this.input.post('report') }}</textarea>
+                        <br/>
+                        <button type="submit" class="btn btn-success btn-lg pull-right" name="flag" value="report">Enviar</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endblock content %}

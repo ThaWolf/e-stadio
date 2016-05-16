@@ -1,0 +1,63 @@
+{% extends constant('THEME_NAME')~'/user/base_profile.twig' %}
+
+{% block info %}
+    <div class="row">
+        <div class="col-sm-8">  
+            <fieldset>
+                <legend>Mis Equipos</legend>                                   
+                <form role="form" class="form-inline" method="post">
+                        <input type="text" name="team_name" placeholder="Nombre" class="form-control"/>         
+                        <select class="form-control" name="game_id">
+                        {% for game in games %}
+                            <option value="{{ game.id }}">{{ game.name }}</option>
+                        {% endfor %}
+                        </select>
+                    <br/><br/>
+                    <button class="btn btn-default" name="flag" value="create_team">Fundar Equipo</button>
+                </form>
+                <hr/>
+                {% if teams|length > 0 %}
+                    <div class="list-group">
+                        {% for team in teams %}
+                            <a href="/equipos/{{ team.id }}/{{ text_normalize(team.name) }}.html" class="list-group-item">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="image-container img-rounded">
+                                            <img src="{{ (team.image == '')?'/img/team_default_image.png':team.image }}"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <h4 class="list-group-item-heading">{{ team.name }}</h4>
+                                        <h5 class="list-group-item-heading">{{ team.game_name }}</h5>
+                                        <p class="list-group-item-text">{{ team.team_size }}/{{ team.max_team_size }}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}            
+                    <div class="alert alert-info">No te encuentras en ningún equipo</div>
+                {% endif %}
+            </fieldset>   
+        </div>
+        <div class="col-sm-4">
+            <fieldset>
+                <legend>Solicitudes</legend>                
+                {% for request in team_requests %}
+                    <div class="team-request">
+                        <a class="clearfix" href="/equipos/{{ request.team_id }}/{{ text_normalize(request.team_name) }}"><strong>{{ request.team_name }}</strong> | <span class="italic">{{ request.game_name }}</span></a>
+                        <form class="pull-right" method="post">
+                            <input type="hidden" name="team_request" value="{{ request.id }}"/>
+                            <button name="flag" value="accept" class="btn btn-success"><i class="fa fa-check"></i></button>
+                            <button name="flag" value="decline" class="btn btn-danger"><i class="fa fa-times"></i></button>
+                        </form>
+                        <div class="clearfix"></div>
+                    </div>
+                    <hr/>
+                {% else %}
+                    <div class="alert alert-info">No hay invitaciones a equipos</div>  
+                {% endfor %}
+            </fieldset>
+        </div>
+    </div>
+{% endblock info %}

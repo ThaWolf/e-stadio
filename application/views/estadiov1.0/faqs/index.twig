@@ -1,0 +1,53 @@
+{% extends constant('THEME_NAME')~'/base.twig' %}
+{% block torneos %}
+    {% for tournament in active_tournaments %}
+    <li><a href="/torneo/{{ tournament.id }}/{{ tournament.name|replace({' ':'-'}) }}.html">{{ tournament.name }}</a></li>
+    {% endfor %}
+{% endblock %}
+{% block content_page %}
+            
+            <section id="faqs-top">
+                <h1 class="text-center">FAQs</h1>
+                <h3>¿Que es esto?</h3>
+                    <p>E­Stadio es una plataforma creada para la gestión, organización y desarrollo
+de torneos para deportes electrónicos. En la página los usuarios podrán crear sus perfiles
+de juego, asociar sus diferentes cuentas, e inscribirse a torneos de gestión automatizada
+con un sencillo sistema de reportes.</p>
+                <h3>¿Puedo hacer mis propios torneos?</h3>
+                    <p>La creación de torneos en la página está disponible para
+organizadores que quieran contactar con E­Stadio como plataforma para su próximo torneo.</p>                
+                <h3>Soy un organizador, ¿donde me contacto?</h3>
+                    <p>Si sos organizador y estás interesado en realizar
+tu torneo en nuestra plataforma, escribinos a torneos@e­stadio.com.ar realizando una breve
+descripción del torneo a realizar y nosotros nos pondremos en contacto a la brevedad.</p>  
+                <h3>Conozco una página igual a esta, ¿se copiaron de uds o ustedes de ellos?</h3>
+                    <p>Los organizadores
+de torneos no es algo que hayamos inventado, nuestra herramienta es parte de una amplia
+oferta de herramientas similares, en un mercado donde entendemos, respetamos y
+apoyamos la libre competencia, ya que es la mejor herramienta que podemos brindarle al
+consumidor para que reciba siempre los mejores servicios. En nuestro caso particular la
+innovación reside en aportar una herramienta 100% adaptable para organizadores y
+usuarios, de la cual puedan apropiarse.
+Nuestra plataforma ha sido diseñada y programada desde cero, por lo que avalamos
+completamente no haber tomado “prestada” ninguna de las especificaciones adherentes al
+código ni diseño de la misma. Apoyamos el crecimiento de los e­sports y la competitividad,
+por lo que invitamos a que competidores busquen mejorar o igualar nuestro producto con
+libertad, pero debido a la inversión monetaria, de tiempo y esfuerzo de nuestros
+programadores y diseñadores, nos gustaría que nos informes si encontrás una copia
+“exacta” de nuestra plataforma en alguna otra web a contacto@e­stadio.com.ar</p>  
+                <h3>¿Hay que pagar?</h3>
+                    <p>La inscripción a la página es 100% gratuita, algunos torneos pueden tener
+costo de inscripción dependiendo de la reglamentación impartida por cada organizador de
+torneo en cada caso.</p>                                                              
+            </section>
+        <!--    <section id="faqs-bottom">
+                <h3>P: ¿Oolor sit amet, consectetuer adipiscing elit?</h3>
+                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel,
+                aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus.
+                Vivamus elementum semper nisi.</p>
+            </section> -->
+            <br><br>
+            <br><br>
+            <div class="divider row">
+            </div>
+{% endblock content_page %}
